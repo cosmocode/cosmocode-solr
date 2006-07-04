@@ -21,11 +21,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.apache.solr</groupId>
-    	<artifactId>solr-core</artifactId>
-    	<version>1.2.0</version>
-    </dependency>
-    <dependency>
     	<groupId>commons-lang</groupId>
     	<artifactId>commons-lang</artifactId>
     </dependency>

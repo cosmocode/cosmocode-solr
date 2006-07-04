@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import de.cosmocode.lucene.AbstractLuceneQuery;
 import de.cosmocode.lucene.LuceneQuery;
 import de.cosmocode.lucene.QueryModifier;
-import de.cosmocode.lucene.TermModifier;
 
 
 /**
@@ -33,73 +32,63 @@ import de.cosmocode.lucene.TermModifier;
  */
 class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
-    private String dtype;
     private final Map<String, Object> requestArguments = new HashMap<String, Object>();
     
     private final StringBuilder queryArguments;
-    private QueryModifier defaultModifier;
     
     private static final Logger logger = Logger.getLogger(DefaultSolrQuery.class);
     
-    
-    
-    
-    /**
-     * This one should be used for subqueries only.
-     */
-    public DefaultSolrQuery () {
-        this.queryArguments = new StringBuilder();
-        this.setStart(0);
-        this.setMax(10);
-        this.setWildCarded(true);
-    }
+    private static final String ERR_START_INVALID = "start must be a non-negative integer (i.e. start >= 0)";
+    private static final String ERR_MAX_INVALID = "max must be a non-negative integer, that is less than " + MAX 
+                                                    + " (i.e. 0 <= max <= " + MAX + ")";
+    private static final String ERR_NO_DTYPE = "SolrQuery needs a dtype";
     
     
     /**
-     * Constructs a new SolrQuery from the given DType (DataType).
-     * @param dtype
+     * This constructor sets start, max and wildCarded to the given values.
+     * <br><br>
+     * An IllegalArgumentException is thrown if the following holds true:<br>
+     * <code>
+     * (start < 0 || max < 0 || max > {@link SolrQuery#MAX})
+     * </code>
+     * @param start the number of the first element returned. Useful for pagination.
+     * @param max the maximum number of documents returned.
+     * @param wildcarded {@link LuceneQuery#setWildCarded(boolean)} is called with the given value
+     * @throws IllegalArgumentException, if start or max is not valid
      */
-    public DefaultSolrQuery (final String dtype) {
-        this (dtype, true);
-    }
-    
-    
-    /**
-     * Constructs a new SolrQuery from the given DType (DataType),
-     * and whether all arguments should be wildCarded or not.
-     * @param dtype
-     * @param wildCarded
-     * @param args
-     */
-    public DefaultSolrQuery (final String dtype, final boolean wildCarded, final Object... args) {
-        this.queryArguments = new StringBuilder();
-        if (dtype != null) {
-            addUnescapedField("dtype_s", dtype, true);
-            this.dtype = dtype;
-        } else {
-            throw new IllegalArgumentException("SolrQuery needs a dtype");
-        }
-        this.setWildCarded(wildCarded);
-        
-        this.setStart(0);
-        this.setMax(10);
-        
-        if (args != null && args.length > 0) {
-            final QueryModifier mod = new QueryModifier(TermModifier.NONE, false, wildCarded, false);
-            for (Object arg : args) {
-                addArgument(arg, mod);
-            }
-        }
-    }
-    
-    
-    public boolean isWildCarded() {
-        return defaultModifier.isWildcarded();
-    }
+    public DefaultSolrQuery (final int start, final int max, final boolean wildCarded) {
+        if (start < 0) throw new IllegalArgumentException(ERR_START_INVALID);
+        if (max < 0 || max > SolrQuery.MAX) throw new IllegalArgumentException(ERR_MAX_INVALID);
 
+        this.queryArguments = new StringBuilder();
+        this.setStart(start);
+        this.setMax(max);
+        this.setWildCarded(wildCarded);
+    }
     
-    public void setWildCarded(boolean wildCarded) {
-        this.defaultModifier = new QueryModifier(defaultModifier.getTermModifier(), defaultModifier.isDisjunct(), wildCarded, defaultModifier.isSplit());
+    
+    /**
+     * This constructor sets start, max and wildCarded to the given values.<br>
+     * It also calls {@link #addUnescaped(CharSequence, boolean)} with (dtype, true).
+     * <br><br>
+     * An IllegalArgumentException is thrown if the following holds true:<br>
+     * <code>
+     * (start < 0 || max < 0 || max > {@link SolrQuery#MAX})
+     * </code>
+     * @param dtype the dtype to append, so that the SolrQuery is initialized with: +dtype_s:`dtype`
+     * @param start the number of the first element returned. Useful for pagination.
+     * @param max the maximum number of documents returned.
+     * @param wildcarded {@link LuceneQuery#setWildCarded(boolean)} is called with the given value
+     * @throws IllegalArgumentException, if start or max is not valid
+     */
+    public DefaultSolrQuery (final String dtype, final int start, final int max, final boolean wildCarded) {
+        this(start, max, wildCarded);
+        
+        if (StringUtils.isNotBlank(dtype)) {
+            addUnescapedField("dtype_s", dtype, true);
+        } else {
+            throw new IllegalArgumentException(ERR_NO_DTYPE);
+        }
     }
 
     
@@ -240,11 +229,6 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     @Override
     public Set<Map.Entry<String, Object>> getRequestArgumentSet() {
         return getRequestArguments(true).entrySet();
-    }
-    
-
-    public String getDtype() {
-        return dtype;
     }
     
     
@@ -433,24 +417,24 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     //---------------------------
     
     
-    public DefaultSolrQuery addField (final String key, final Object value, final QueryModifier modifiers) {
-        if (value instanceof Collection<?>) {
-            return this.addFieldAsCollection(key, (Collection<?>)value, modifiers);
-        } else if (value instanceof String) {
-            return this.addField(key, (String)value, modifiers);
-        } else if (value != null && value.getClass().isArray()) {
-            return this.addFieldAsArray(key, value, modifiers);
-        }
-        
-        // default implementation: no check possible
-        if (StringUtils.isNotBlank(key) && value != null) {
-            startField(key, modifiers);
-            addArgument(value, modifiers);
-            endField();
-        }
-        
-        return this;
-    }
+//    public DefaultSolrQuery addField (final String key, final Object value, final QueryModifier modifiers) {
+//        if (value instanceof Collection<?>) {
+//            return this.addFieldAsCollection(key, (Collection<?>)value, modifiers);
+//        } else if (value instanceof String) {
+//            return this.addField(key, (String)value, modifiers);
+//        } else if (value != null && value.getClass().isArray()) {
+//            return this.addFieldAsArray(key, value, modifiers);
+//        }
+//        
+//        // default implementation: no check possible
+//        if (StringUtils.isNotBlank(key) && value != null) {
+//            startField(key, modifiers);
+//            addArgument(value, modifiers);
+//            endField();
+//        }
+//        
+//        return this;
+//    }
     
     
     @Override

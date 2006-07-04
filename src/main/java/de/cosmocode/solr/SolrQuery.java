@@ -20,6 +20,9 @@ import de.cosmocode.lucene.LuceneQuery;
 public interface SolrQuery extends LuceneQuery {
     
     // TODO: find out real max value
+    /**
+     * This is the maximum value for "max" that solr can handle, which is {@value}.
+     */
     public static final int MAX = 10000000;
     
     

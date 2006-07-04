@@ -29,7 +29,7 @@ import java.util.Collection;
 public abstract class AbstractLuceneQuery implements LuceneQuery {
     
     
-    private QueryModifier defaultModifier;
+    protected QueryModifier defaultModifier;
     
     
     /**

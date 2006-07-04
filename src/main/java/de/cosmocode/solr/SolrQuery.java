@@ -28,12 +28,6 @@ public interface SolrQuery extends LuceneQuery {
      */
     public String getSelectFields();
     
-
-    /**
-     * @param selectFields the fields returned by the query - can be null; null and "*" indicate that all are selected.
-     */
-    public void setSelectFields(final String selectFields);
-    
     
     /**
      * @param fields the fields returned by the query - can be null; null indicates that all are selected.
@@ -50,7 +44,7 @@ public interface SolrQuery extends LuceneQuery {
     /**
      * @param sortFields the fields on which the result is sorted on - can be null.
      */
-    public void setSortFields(String sortFields);
+    public void sortFields(String... sortFields);
     
 
     /**

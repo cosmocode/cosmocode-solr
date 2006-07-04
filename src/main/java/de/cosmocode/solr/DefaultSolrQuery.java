@@ -111,17 +111,11 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
         }
         return "*";
     }
-
-    
-    @Override
-    public void setSelectFields(final String selectFields) {
-        requestArguments.put("fl", selectFields);
-    }
     
     
     @Override
     public void selectFields(String... fields) {
-        setSelectFields(StringUtils.join(fields, ","));
+        requestArguments.put("fl", StringUtils.join(fields, ","));
     }
 
     
@@ -136,8 +130,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
 
     
     @Override
-    public void setSortFields(String sortFields) {
-        requestArguments.put("sort", sortFields);
+    public void sortFields(String... sortFields) {
+        requestArguments.put("sort", StringUtils.join(sortFields, ","));
     }
 
     

@@ -47,6 +47,23 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
         this.defaultModifier = defaultModifier;
     }
     
+
+    
+    //---------------------------
+    //   default getter and setter
+    //---------------------------
+    
+    
+    @Override
+    public boolean isWildCarded() {
+        return defaultModifier.isWildcarded();
+    }
+    
+    @Override
+    public void setWildCarded(boolean wildCarded) {
+        this.defaultModifier = new QueryModifier(defaultModifier.getTermModifier(), defaultModifier.isDisjunct(), wildCarded, defaultModifier.isSplit());
+    }
+    
     
     @Override
     public final QueryModifier getDefaultQueryModifier() {

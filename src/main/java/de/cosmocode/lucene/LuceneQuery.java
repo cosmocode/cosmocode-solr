@@ -33,6 +33,26 @@ public interface LuceneQuery {
     
     // TODO: JavaDoc
     
+
+    /**
+     * @return true if this LuceneQuery appends a wildcard ("*") after each added argument, false otherwise 
+     */
+    public boolean isWildCarded();
+    
+    
+    /**
+     * The wildcard parameter.<br>
+     * Set it to true to append a wildcard ("*") after each added argument,
+     * false to turn this behaviour off (and just append each argument as is).
+     * <br> <br>
+     * <i>Implementation note</i>:
+     * To remain a coherent user experience,
+     * the implementation should alter the default QueryModifier
+     * (i.e. set a new default QueryModifier with wildcarded set to the given value).
+     * @param wildCarded true to turn wildcarded behaviour on, false to turn it off.
+     */
+    public void setWildCarded(final boolean wildCarded);
+    
     
     /**
      * Sets a default QueryModifier that is used

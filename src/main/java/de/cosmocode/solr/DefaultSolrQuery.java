@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import de.cosmocode.lucene.AbstractLuceneQueryBuilder;
-import de.cosmocode.lucene.LuceneQueryBuilder;
+import de.cosmocode.lucene.AbstractLuceneQuery;
+import de.cosmocode.lucene.LuceneQuery;
 import de.cosmocode.lucene.QueryModifier;
 import de.cosmocode.lucene.TermModifier;
 
@@ -25,10 +25,13 @@ import de.cosmocode.lucene.TermModifier;
  * <p>
  * <strong>Important:</strong> The SolrQuery class is not thread-safe. It should be synchronized externally.
  * </p>
+ * 
+ * @see SolrQueryFactory
+ * 
  * @author olorenz
  *
  */
-class DefaultSolrQuery extends AbstractLuceneQueryBuilder implements SolrQuery {
+class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     private String dtype;
     private final Map<String, Object> requestArguments = new HashMap<String, Object>();
@@ -246,7 +249,6 @@ class DefaultSolrQuery extends AbstractLuceneQueryBuilder implements SolrQuery {
     }
     
 
-    @Override
     public String getDtype() {
         return dtype;
     }
@@ -382,7 +384,7 @@ class DefaultSolrQuery extends AbstractLuceneQueryBuilder implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addSubquery (final LuceneQueryBuilder value, final boolean mandatory) {
+    public DefaultSolrQuery addSubquery (final LuceneQuery value, final boolean mandatory) {
         if (value != null) {
             if (mandatory) queryArguments.append("+");
             queryArguments.append("(").append(value.getQuery()).append(") ");
@@ -393,7 +395,7 @@ class DefaultSolrQuery extends AbstractLuceneQueryBuilder implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addSubquery (final LuceneQueryBuilder value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addSubquery (final LuceneQuery value, final QueryModifier modifiers) {
         if (value != null) {
             queryArguments.append(modifiers.getTermPrefix());
             queryArguments.append("(").append(value.getQuery()).append(") ");

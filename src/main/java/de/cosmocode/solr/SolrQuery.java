@@ -3,7 +3,7 @@ package de.cosmocode.solr;
 import java.util.Map;
 import java.util.Set;
 
-import de.cosmocode.lucene.LuceneQueryBuilder;
+import de.cosmocode.lucene.LuceneQuery;
 
 /**
  * <p>
@@ -17,11 +17,10 @@ import de.cosmocode.lucene.LuceneQueryBuilder;
  * @author olorenz
  *
  */
-public interface SolrQuery extends LuceneQueryBuilder {
+public interface SolrQuery extends LuceneQuery {
     
+    // TODO: find out real max value
     public static final int MAX = 10000000;
-    
-    // TODO: JavaDoc
     
     
     /**
@@ -126,12 +125,6 @@ public interface SolrQuery extends LuceneQueryBuilder {
      * @return the keys of the request arguments
      */
     public Set<Map.Entry<String, Object>> getRequestArgumentSet();
-    
-
-    /**
-     * @return the data type, stored in the field "dtype_s". 
-     */
-    public String getDtype();
     
     
     /**

@@ -5,24 +5,28 @@ import java.util.Collection;
 
 /**
  * An interface that specifies a builder for Lucene queries.
- * An abstract implemententation, that takes care of the most simple 
+ * <br> <br>
+ * An abstract implemententation of this interface,
+ * that takes care of the redirects to methods with
+ * default values and those with old style "boolean mandatory" signature,
+ * is available at {@link AbstractLuceneQuery}.
  * 
- * @see AbstractLuceneQueryBuilder
+ * @see AbstractLuceneQuery
  * 
  * @author olorenz
  *
  */
-public interface LuceneQueryBuilder {
+public interface LuceneQuery {
     
     /**
      * The default fuzzyness. It is used by
      * <ul>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String)}</li>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String, boolean)}</li>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String, QueryModifier)}</li>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String)}</li>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String, boolean)}</li>
-     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String, QueryModifier)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyArgument(String)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyArgument(String, boolean)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyArgument(String, QueryModifier)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyField(String, String)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyField(String, String, boolean)}</li>
+     *  <li> {@link LuceneQuery#addFuzzyField(String, String, QueryModifier)}</li>
      * </ul>
      */
     public static final double defaultFuzzyness = 0.5;
@@ -66,7 +70,7 @@ public interface LuceneQueryBuilder {
      * @param value the value to search for
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyArgument (String value);
+    public LuceneQuery addFuzzyArgument (String value);
 
     
     /**
@@ -80,7 +84,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory if true then the value must be found, otherwise it is just prioritized in the search results
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyArgument (String value, boolean mandatory);
+    public LuceneQuery addFuzzyArgument (String value, boolean mandatory);
     
     
     /**
@@ -92,7 +96,7 @@ public interface LuceneQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 (inclusive) and 1 (exclusive), so that: 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyArgument (String value, boolean mandatory, double fuzzyness);
+    public LuceneQuery addFuzzyArgument (String value, boolean mandatory, double fuzzyness);
     
     
     /**
@@ -105,7 +109,7 @@ public interface LuceneQueryBuilder {
      * @param modifier the QueryModifier affects the way in that the argument is added.
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyArgument (String value, QueryModifier modifier);
+    public LuceneQuery addFuzzyArgument (String value, QueryModifier modifier);
     
     
     /**
@@ -117,7 +121,7 @@ public interface LuceneQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 (inclusive) and 1 (exclusive), so that: 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyArgument (String value, QueryModifier modifier, double fuzzyness);
+    public LuceneQuery addFuzzyArgument (String value, QueryModifier modifier, double fuzzyness);
 
     
     
@@ -131,7 +135,7 @@ public interface LuceneQueryBuilder {
      * @param value
      * @return this
      */
-    public LuceneQueryBuilder addArgument (String value);
+    public LuceneQuery addArgument (String value);
     
     
     /**
@@ -140,7 +144,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory
      * @return this
      */
-    public LuceneQueryBuilder addArgument (String value, boolean mandatory);
+    public LuceneQuery addArgument (String value, boolean mandatory);
     
     
     /**
@@ -149,7 +153,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addArgument (String value, QueryModifier modifier);
+    public LuceneQuery addArgument (String value, QueryModifier modifier);
     
     
     /**
@@ -157,7 +161,7 @@ public interface LuceneQueryBuilder {
      * @param values
      * @return this
      */
-    public LuceneQueryBuilder addArgument (Collection<?> values);
+    public LuceneQuery addArgument (Collection<?> values);
     
     
     /**
@@ -165,7 +169,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory
      * @return this
      */
-    public LuceneQueryBuilder addArgument (Collection<?> values, boolean mandatory);
+    public LuceneQuery addArgument (Collection<?> values, boolean mandatory);
     
     
     /**
@@ -174,7 +178,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addArgument (Collection<?> values, QueryModifier modifier);
+    public LuceneQuery addArgument (Collection<?> values, QueryModifier modifier);
     
     
     /**
@@ -183,7 +187,7 @@ public interface LuceneQueryBuilder {
      * @param values
      * @return this
      */
-    public <K> LuceneQueryBuilder addArgument (K[] values);
+    public <K> LuceneQuery addArgument (K[] values);
     
     
     /**
@@ -192,7 +196,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory
      * @return this
      */
-    public <K> LuceneQueryBuilder addArgument (K[] values, boolean mandatory);
+    public <K> LuceneQuery addArgument (K[] values, boolean mandatory);
     
     
     /**
@@ -201,7 +205,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory
      * @return this
      */
-    public <K> LuceneQueryBuilder addArgument (K[] values, QueryModifier modifier);
+    public <K> LuceneQuery addArgument (K[] values, QueryModifier modifier);
     
     
     
@@ -214,7 +218,7 @@ public interface LuceneQueryBuilder {
      * @param values
      * @return this
      */
-    public LuceneQueryBuilder addArgumentAsCollection (Collection<?> values);
+    public LuceneQuery addArgumentAsCollection (Collection<?> values);
     
     
     /**
@@ -223,7 +227,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addArgumentAsCollection (Collection<?> values, QueryModifier modifier);
+    public LuceneQuery addArgumentAsCollection (Collection<?> values, QueryModifier modifier);
     
     
     /**
@@ -235,7 +239,7 @@ public interface LuceneQueryBuilder {
      * @param values
      * @return this
      */
-    public <K> LuceneQueryBuilder addArgumentAsArray (K[] values);
+    public <K> LuceneQuery addArgumentAsArray (K[] values);
     
     
     /**
@@ -245,7 +249,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public <K> LuceneQueryBuilder addArgumentAsArray (K[] values, QueryModifier modifier);
+    public <K> LuceneQuery addArgumentAsArray (K[] values, QueryModifier modifier);
     
     
     /**
@@ -256,7 +260,7 @@ public interface LuceneQueryBuilder {
      * @param values the array of terms to search for
      * @return this
      */
-    public LuceneQueryBuilder addArgumentAsArray (Object values);
+    public LuceneQuery addArgumentAsArray (Object values);
     
     
     /**
@@ -266,7 +270,7 @@ public interface LuceneQueryBuilder {
      * @param modifier the modifier for the search of this term.
      * @return this
      */
-    public LuceneQueryBuilder addArgumentAsArray (Object values, QueryModifier modifier);
+    public LuceneQuery addArgumentAsArray (Object values, QueryModifier modifier);
     
     
     
@@ -283,7 +287,7 @@ public interface LuceneQueryBuilder {
      * @param value the SubQuery to add
      * @return this
      */
-    public LuceneQueryBuilder addSubquery (LuceneQueryBuilder value);
+    public LuceneQuery addSubquery (LuceneQuery value);
     
     
     /**
@@ -293,7 +297,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory
      * @return this
      */
-    public LuceneQueryBuilder addSubquery (LuceneQueryBuilder value, boolean mandatory);
+    public LuceneQuery addSubquery (LuceneQuery value, boolean mandatory);
     
     
     /**
@@ -303,7 +307,7 @@ public interface LuceneQueryBuilder {
      * @param modifiers
      * @return this
      */
-    public LuceneQueryBuilder addSubquery (LuceneQueryBuilder value, QueryModifier modifiers);
+    public LuceneQuery addSubquery (LuceneQuery value, QueryModifier modifiers);
     
     
     
@@ -321,7 +325,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory whether the field is mandatory or not
      * @return this
      */
-    public LuceneQueryBuilder addUnescapedField (String key, CharSequence value, boolean mandatory);
+    public LuceneQuery addUnescapedField (String key, CharSequence value, boolean mandatory);
     
     
     /**
@@ -333,7 +337,7 @@ public interface LuceneQueryBuilder {
      * @param mandatory whether the argument is mandatory or not
      * @return this
      */
-    public LuceneQueryBuilder addUnescaped (CharSequence value, boolean mandatory);
+    public LuceneQuery addUnescaped (CharSequence value, boolean mandatory);
     
     
     
@@ -352,7 +356,7 @@ public interface LuceneQueryBuilder {
      * @param value the (string)-value of the field
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, String value);
+    public LuceneQuery addField (String key, String value);
     
     
     /**
@@ -362,13 +366,13 @@ public interface LuceneQueryBuilder {
      * @param mandatoryKey
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, String value, boolean mandatoryKey);
+    public LuceneQuery addField (String key, String value, boolean mandatoryKey);
     
     
     /**
      * Append a field with a string value, and apply a boost afterwards 
      * 
-     * @see LuceneQueryBuilder#addField(String, String, boolean)
+     * @see LuceneQuery#addField(String, String, boolean)
      * 
      * @param key
      * @param value
@@ -376,7 +380,7 @@ public interface LuceneQueryBuilder {
      * @param boostFactor
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, String value, boolean mandatoryKey, double boostFactor);
+    public LuceneQuery addField (String key, String value, boolean mandatoryKey, double boostFactor);
     
     
     /**
@@ -387,7 +391,7 @@ public interface LuceneQueryBuilder {
      * @param boostFactor
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, String value, QueryModifier modifier);
+    public LuceneQuery addField (String key, String value, QueryModifier modifier);
     
     
     
@@ -405,13 +409,13 @@ public interface LuceneQueryBuilder {
      * @param mandatoryValue
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue);
+    public LuceneQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue);
     
     
     /**
      * Append a field with a collection of values, and apply a boost afterwards 
      * 
-     * @see LuceneQueryBuilder#addField(String, boolean, Collection, boolean)
+     * @see LuceneQuery#addField(String, boolean, Collection, boolean)
      * 
      * @param key
      * @param mandatoryKey
@@ -420,7 +424,7 @@ public interface LuceneQueryBuilder {
      * @param boostFactor
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor);
+    public LuceneQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor);
     
 
     /**
@@ -433,7 +437,7 @@ public interface LuceneQueryBuilder {
      * @param value
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, Collection<?> value);
+    public LuceneQuery addField (String key, Collection<?> value);
     
 
     /**
@@ -445,7 +449,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addField (String key, Collection<?> value, QueryModifier modifier);
+    public LuceneQuery addField (String key, Collection<?> value, QueryModifier modifier);
 
     
     
@@ -467,7 +471,7 @@ public interface LuceneQueryBuilder {
      * @param modifier the query modifier
      * @return this
      */
-    public <K> LuceneQueryBuilder addField (String key, K[] value);
+    public <K> LuceneQuery addField (String key, K[] value);
     
     
     /**
@@ -480,7 +484,7 @@ public interface LuceneQueryBuilder {
      * @param modifier the query modifier
      * @return this
      */
-    public <K> LuceneQueryBuilder addField (String key, K[] value, QueryModifier modifier);
+    public <K> LuceneQuery addField (String key, K[] value, QueryModifier modifier);
     
     
 
@@ -502,7 +506,7 @@ public interface LuceneQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyField (String key, String value);
+    public LuceneQuery addFuzzyField (String key, String value);
     
     
     /**
@@ -516,7 +520,7 @@ public interface LuceneQueryBuilder {
      * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyField (String key, String value, boolean mandatoryKey);
+    public LuceneQuery addFuzzyField (String key, String value, boolean mandatoryKey);
     
     
     /**
@@ -530,7 +534,7 @@ public interface LuceneQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyField (String key, String value, boolean mandatoryKey, double fuzzyness);
+    public LuceneQuery addFuzzyField (String key, String value, boolean mandatoryKey, double fuzzyness);
     
     
     /**
@@ -545,7 +549,7 @@ public interface LuceneQueryBuilder {
      * @param mod the modifiers to use
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyField (String key, String value, QueryModifier mod);
+    public LuceneQuery addFuzzyField (String key, String value, QueryModifier mod);
     
     
     /**
@@ -559,7 +563,7 @@ public interface LuceneQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQueryBuilder addFuzzyField (String key, String value, QueryModifier mod, double fuzzyness);
+    public LuceneQuery addFuzzyField (String key, String value, QueryModifier mod, double fuzzyness);
 
     
 
@@ -584,7 +588,7 @@ public interface LuceneQueryBuilder {
      * @param value the collection of values for the field
      * @return this
      */
-    public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value);
+    public LuceneQuery addFieldAsCollection (String key, Collection<?> value);
     
     
     /**
@@ -596,13 +600,13 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier);
+    public LuceneQuery addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier);
     
     
     /**
      * Append a field with a collection of values, and apply a boost afterwards 
      * 
-     * @see LuceneQueryBuilder#addFieldAsCollection(String, Collection, QueryModifier)
+     * @see LuceneQuery#addFieldAsCollection(String, Collection, QueryModifier)
      * 
      * @param key
      * @param value
@@ -610,7 +614,7 @@ public interface LuceneQueryBuilder {
      * @param boost
      * @return this
      */
-    public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier, double boost);
+    public LuceneQuery addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier, double boost);
     
     
     /**
@@ -622,7 +626,7 @@ public interface LuceneQueryBuilder {
      * @param value
      * @return this
      */
-    public <K> LuceneQueryBuilder addFieldAsArray (String key, K[] value);
+    public <K> LuceneQuery addFieldAsArray (String key, K[] value);
     
     
     /**
@@ -635,7 +639,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public <K> LuceneQueryBuilder addFieldAsArray (String key, K[] value, QueryModifier modifier);
+    public <K> LuceneQuery addFieldAsArray (String key, K[] value, QueryModifier modifier);
     
     
     /**
@@ -647,7 +651,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addFieldAsArray (String key, Object value);
+    public LuceneQuery addFieldAsArray (String key, Object value);
     
     
     /**
@@ -659,7 +663,7 @@ public interface LuceneQueryBuilder {
      * @param modifier
      * @return this
      */
-    public LuceneQueryBuilder addFieldAsArray (String key, Object value, QueryModifier modifier);
+    public LuceneQuery addFieldAsArray (String key, Object value, QueryModifier modifier);
     
     
     
@@ -671,35 +675,35 @@ public interface LuceneQueryBuilder {
     /**
      * Starts a field with `key`:(.<br>
      * <b>Attention</b>: Use this method carefully and end all fields with 
-     * {@link LuceneQueryBuilder#endField()},
+     * {@link LuceneQuery#endField()},
      * or otherwise you get Solr-Exceptions on execution.
      * @param fieldName the name of the field; omitted if null
      * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
      * @return this
      */
-    public LuceneQueryBuilder startField (String fieldName, boolean mandatory);
+    public LuceneQuery startField (String fieldName, boolean mandatory);
     
     
     /**
      * Starts a field with `key`:(.<br>
      * <b>Attention</b>: Use this method carefully and end all fields with 
-     * {@link LuceneQueryBuilder#endField()},
+     * {@link LuceneQuery#endField()},
      * or otherwise you get Solr-Exceptions on execution.
      * @param fieldName the name of the field; omitted if null
      * @param modifier the modifiers for the field (see QueryModifier for more details)
      * @return this
      */
-    public LuceneQueryBuilder startField (String fieldName, QueryModifier modifier);
+    public LuceneQuery startField (String fieldName, QueryModifier modifier);
     
     
     /**
      * Ends a previously started field. <br>
      * <b>Attention</b>: Use this method carefully and only end fields that have been started with
-     * {@link LuceneQueryBuilder#startField(String, boolean)},
+     * {@link LuceneQuery#startField(String, boolean)},
      * or otherwise you get Solr-Exceptions on execution.
      * @return this
      */
-    public LuceneQueryBuilder endField ();
+    public LuceneQuery endField ();
     
     
     /**
@@ -709,7 +713,7 @@ public interface LuceneQueryBuilder {
      * @param boostFactor a positive double < 10.000.000 which boosts the previously added element
      * @return this
      */
-    public LuceneQueryBuilder addBoost (double boostFactor);
+    public LuceneQuery addBoost (double boostFactor);
     
 
 }

@@ -10,16 +10,17 @@ public final class SolrQueryFactory {
     /**
      * @return a SolrQuery which is not thread-safe
      */
-    public static SolrQuery getDefaultSolrQuery() {
+    public static SolrQuery createSolrQuery() {
         return new DefaultSolrQuery();
     }
     
     
     /**
-     * @return a SolrQuery which is not thread-safe
+     * Returns a new SolrQuery that is not thread-safe and is initialized with the query: "+dtype_s:"+dtype.
+     * @return a new SolrQuery which is not thread-safe
      * @param dtype the "dtype_s" field is automatically initialized with this value
      */
-    public static SolrQuery getConsecutiveSolrQuery(final String dtype) {
+    public static SolrQuery createSolrQuery(final String dtype) {
         return new DefaultSolrQuery(dtype);
     }
     

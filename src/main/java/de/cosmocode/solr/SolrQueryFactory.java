@@ -1,6 +1,5 @@
 package de.cosmocode.solr;
 
-import de.cosmocode.solr.impl.AppendingSolrQuery;
 
 
 public final class SolrQueryFactory {

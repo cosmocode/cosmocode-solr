@@ -1,4 +1,4 @@
-package de.cosmocode.solr.impl;
+package de.cosmocode.solr;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -11,9 +11,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import de.cosmocode.solr.QueryModifier;
-import de.cosmocode.solr.SolrQuery;
-import de.cosmocode.solr.TermModifier;
 
 /**
  * <p>

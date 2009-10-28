@@ -3,13 +3,15 @@ package de.cosmocode.solr;
 import java.util.Map;
 import java.util.Set;
 
+import de.cosmocode.lucene.LuceneQueryBuilder;
+
 /**
  * <p>
  * This is a shortcut for building Solr queries. 
  * It can be directly passed to the SearchClient, which then converts it as needed.
  * </p>
  * 
- * @see ConsecutiveSolrQuery
+ * @see DefaultSolrQuery
  * @see SolrQueryFactory
  * 
  * @author olorenz

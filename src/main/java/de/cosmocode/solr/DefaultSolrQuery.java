@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import de.cosmocode.lucene.LuceneQueryBuilder;
+import de.cosmocode.lucene.QueryModifier;
+
 
 /**
  * <p>
@@ -23,7 +26,7 @@ import org.apache.log4j.Logger;
  * @author olorenz
  *
  */
-class ConsecutiveSolrQuery implements SolrQuery {
+class DefaultSolrQuery implements SolrQuery {
     
     private String dtype;
     private final Map<String, Object> requestArguments = new HashMap<String, Object>();
@@ -31,7 +34,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     private final StringBuilder queryArguments;
     private QueryModifier defaultModifier;
     
-    private static final Logger logger = Logger.getLogger(ConsecutiveSolrQuery.class);
+    private static final Logger logger = Logger.getLogger(DefaultSolrQuery.class);
     
     
     
@@ -39,7 +42,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     /**
      * This one should be used for subqueries only.
      */
-    public ConsecutiveSolrQuery () {
+    public DefaultSolrQuery () {
         this.queryArguments = new StringBuilder();
         this.setStart(0);
         this.setMax(10);
@@ -51,7 +54,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
      * Constructs a new SolrQuery from the given DType (DataType).
      * @param dtype
      */
-    public ConsecutiveSolrQuery (final String dtype) {
+    public DefaultSolrQuery (final String dtype) {
         this (dtype, true);
     }
     
@@ -63,7 +66,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
      * @param wildCarded
      * @param args
      */
-    public ConsecutiveSolrQuery (final String dtype, final boolean wildCarded, final Object... args) {
+    public DefaultSolrQuery (final String dtype, final boolean wildCarded, final Object... args) {
         this.queryArguments = new StringBuilder();
         if (dtype != null) {
             addUnescapedField("dtype_s", dtype, true);
@@ -253,19 +256,19 @@ class ConsecutiveSolrQuery implements SolrQuery {
     //---------------------------
     
     // shortcuts
-    public ConsecutiveSolrQuery and() {
+    public DefaultSolrQuery and() {
         return this.addUnescaped("AND", false);
     }
-    public ConsecutiveSolrQuery or() {
+    public DefaultSolrQuery or() {
         return this.addUnescaped("OR", false);
     }
-    public ConsecutiveSolrQuery not() {
+    public DefaultSolrQuery not() {
         return this.addUnescaped("NOT", false);
     }
     
 
     @Override
-    public ConsecutiveSolrQuery addFuzzyArgument (final String value, boolean mandatory) {
+    public DefaultSolrQuery addFuzzyArgument (final String value, boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
         final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
         return this.addFuzzyArgument(value, mod, defaultFuzzyness);
@@ -273,7 +276,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addFuzzyArgument (final String value, boolean mandatory, double fuzzyness) {
+    public DefaultSolrQuery addFuzzyArgument (final String value, boolean mandatory, double fuzzyness) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
         final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
         return this.addFuzzyArgument(value, mod, fuzzyness);
@@ -281,7 +284,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addFuzzyArgument (final String value, final QueryModifier modifier, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyArgument (final String value, final QueryModifier modifier, final double fuzzyness) {
         if (fuzzyness < 0.0 || fuzzyness >= 1.0)
             throw new IllegalArgumentException("fuzzyness must be greater than equals 0 and less than 1 (i.e. 0 <= fuzzyness < 1)");
         
@@ -299,7 +302,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
 
     
     @Override
-    public ConsecutiveSolrQuery addArgument (final String value, final boolean mandatory) {
+    public DefaultSolrQuery addArgument (final String value, final boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
         final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
         return this.addArgument(value, mod);
@@ -307,7 +310,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addArgument (final String value, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgument (final String value, final QueryModifier modifier) {
         // TODO: implement isSplit() of QueryModifier
         if (StringUtils.isNotBlank(value) && modifier != null) {
             queryArguments.append(modifier.getTermPrefix());
@@ -332,7 +335,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     // add collection and array
     
     @Override
-    public ConsecutiveSolrQuery addArgument (final Collection<?> value, final boolean mandatory) {
+    public DefaultSolrQuery addArgument (final Collection<?> value, final boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
         final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
         return this.addArgumentAsCollection(value, mod);
@@ -340,13 +343,13 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public <K> ConsecutiveSolrQuery addArgument (final K[] values, final QueryModifier modifiers) {
+    public <K> DefaultSolrQuery addArgument (final K[] values, final QueryModifier modifiers) {
         return this.addArgumentAsArray(values, modifiers);
     }
     
     
     @Override
-    public ConsecutiveSolrQuery addArgumentAsCollection (final Collection<?> values, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgumentAsCollection (final Collection<?> values, final QueryModifier modifier) {
         if (values != null && values.size() > 0) {
             // start
             queryArguments.append("(");
@@ -371,7 +374,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public <K> ConsecutiveSolrQuery addArgumentAsArray (final K[] values, final QueryModifier modifier) {
+    public <K> DefaultSolrQuery addArgumentAsArray (final K[] values, final QueryModifier modifier) {
         if (values != null && values.length > 0) {
             // start
             queryArguments.append("(");
@@ -396,7 +399,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addArgumentAsArray (Object values, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgumentAsArray (Object values, final QueryModifier modifier) {
         if (values != null && values.getClass().isArray() && Array.getLength(values) > 0) {
             final int arrayLength = Array.getLength(values);
             
@@ -423,7 +426,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addArgument (final Object value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addArgument (final Object value, final QueryModifier modifiers) {
         if (value == null) return this;
         
         if (value instanceof String) {
@@ -432,8 +435,8 @@ class ConsecutiveSolrQuery implements SolrQuery {
             return this.addArgumentAsCollection((Collection<?>)value, modifiers);
         } else if (value.getClass().isArray()) { 
             return this.addArgumentAsArray(value, modifiers);
-        } else if (value instanceof ConsecutiveSolrQuery) {
-            return this.addSubquery((ConsecutiveSolrQuery)value, modifiers);
+        } else if (value instanceof DefaultSolrQuery) {
+            return this.addSubquery((DefaultSolrQuery)value, modifiers);
         } else {
             return this.addArgument(value.toString(), modifiers);
         }
@@ -442,7 +445,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addSubquery (final SolrQuery value, final boolean mandatory) {
+    public DefaultSolrQuery addSubquery (final LuceneQueryBuilder value, final boolean mandatory) {
         if (value != null) {
             if (mandatory) queryArguments.append("+");
             queryArguments.append("(").append(value.getQuery()).append(") ");
@@ -453,7 +456,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addSubquery (final SolrQuery value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addSubquery (final LuceneQueryBuilder value, final QueryModifier modifiers) {
         if (value != null) {
             queryArguments.append(modifiers.getTermPrefix());
             queryArguments.append("(").append(value.getQuery()).append(") ");
@@ -470,7 +473,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addUnescapedField (final String key, final CharSequence value, final boolean mandatory) {
+    public DefaultSolrQuery addUnescapedField (final String key, final CharSequence value, final boolean mandatory) {
         if (key == null || value == null) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -481,7 +484,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addUnescaped (final CharSequence value, final boolean mandatory) {
+    public DefaultSolrQuery addUnescaped (final CharSequence value, final boolean mandatory) {
         if (value == null) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -498,7 +501,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addField (final String key, final Object value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addField (final String key, final Object value, final QueryModifier modifiers) {
         if (value instanceof Collection<?>) {
             return this.addFieldAsCollection(key, (Collection<?>)value, modifiers);
         } else if (value instanceof String) {
@@ -519,7 +522,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addField (final String key, final String value, final boolean mandatoryKey) {
+    public DefaultSolrQuery addField (final String key, final String value, final boolean mandatoryKey) {
         final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
         final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
         return this.addField(key, value, mod);
@@ -527,13 +530,13 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addField (String key, String value, boolean mandatoryKey, double boostFactor) {
+    public DefaultSolrQuery addField (String key, String value, boolean mandatoryKey, double boostFactor) {
         return this.addField(key, value, mandatoryKey).addBoost(boostFactor);
     }
     
     
     @Override
-    public ConsecutiveSolrQuery addField (final String key, final String value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addField (final String key, final String value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
             this.startField(key, modifiers);
             this.addArgument(value, modifiers);
@@ -552,13 +555,13 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey) {
+    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey) {
         return this.addFuzzyField(key, value, mandatoryKey, defaultFuzzyness);
     }
     
     
     @Override
-    public ConsecutiveSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
             this.startField(key, mandatoryKey);
             this.addFuzzyArgument(value, false, fuzzyness);
@@ -577,7 +580,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue) {
+    public DefaultSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue) {
         if (StringUtils.isNotBlank(key) && value != null && value.size() > 0) {
             startField(key, mandatoryKey);
             addArgument(value, mandatoryValue);
@@ -589,19 +592,19 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor) {
+    public DefaultSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor) {
         return this.addField(key, mandatoryKey, value, mandatoryValue).addBoost(boostFactor);
     }
     
     
     @Override
-    public <K> ConsecutiveSolrQuery addField (final String key, final K[] value, final QueryModifier modifiers) {
+    public <K> DefaultSolrQuery addField (final String key, final K[] value, final QueryModifier modifiers) {
         return this.addFieldAsArray(key, value, modifiers);
     }
 
     
     @Override
-    public ConsecutiveSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.size() > 0) {
             startField(key, modifiers);
             addArgumentAsCollection(value, modifiers);
@@ -613,13 +616,13 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers, final double boost) {
+    public DefaultSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers, final double boost) {
         return this.addFieldAsCollection(key, value, modifiers).addBoost(boost);
     }
     
     
     @Override
-    public <K> ConsecutiveSolrQuery addFieldAsArray (final String key, final K[] value, final QueryModifier modifiers) {
+    public <K> DefaultSolrQuery addFieldAsArray (final String key, final K[] value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.length > 0) {
             startField(key, modifiers);
             addArgumentAsArray(value, modifiers);
@@ -631,7 +634,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addFieldAsArray (final String key, final Object value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addFieldAsArray (final String key, final Object value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.getClass().isArray() && Array.getLength(value) > 0) {
             startField(key, modifiers);
             addArgumentAsArray(value, modifiers);
@@ -647,7 +650,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     //---------------------------
     
     @Override
-    public ConsecutiveSolrQuery startField (final String fieldName, final boolean mandatory) {
+    public DefaultSolrQuery startField (final String fieldName, final boolean mandatory) {
         if (StringUtils.isBlank(fieldName)) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -658,7 +661,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery startField (final String fieldName, final QueryModifier modifier) {
+    public DefaultSolrQuery startField (final String fieldName, final QueryModifier modifier) {
         if (StringUtils.isBlank(fieldName)) return this;
         
         queryArguments.append(modifier.getTermPrefix());
@@ -669,7 +672,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery endField () {
+    public DefaultSolrQuery endField () {
         if (queryArguments.charAt(queryArguments.length()-1) == '(') {
             // add an empty string, if the field was ended right after it was started
             queryArguments.append("\"\"");
@@ -681,7 +684,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
-    public ConsecutiveSolrQuery addBoost (final double boostFactor) {
+    public DefaultSolrQuery addBoost (final double boostFactor) {
         if (boostFactor <= 0.0 || boostFactor >= 10000000.0)
             throw new IllegalArgumentException("boostFactor must be greater than 0 and less than 10.000.000 (10 Mio.)");
         
@@ -806,7 +809,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
 
 
     @Override
-    public SolrQuery addSubquery(SolrQuery value) {
+    public SolrQuery addSubquery(LuceneQueryBuilder value) {
         // TODO Auto-generated method stub
         return null;
     }

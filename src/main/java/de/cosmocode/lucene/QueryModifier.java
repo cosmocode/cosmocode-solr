@@ -1,6 +1,9 @@
-package de.cosmocode.solr;
+package de.cosmocode.lucene;
 
 import de.cosmocode.patterns.Immutable;
+import de.cosmocode.solr.SolrQuery;
+import de.cosmocode.solr.SolrQueryFactory;
+import de.cosmocode.solr.TermModifier;
 
 /**
  * This is an immutable class that affects the addTerm and addField methods of SolrQuery.
@@ -48,7 +51,7 @@ public final class QueryModifier {
      * A call to {@link LuceneQueryBuilder#addField(String, Object[], QueryModifier)} would look like this:<br>
      * <pre>
      * final QueryModifier mod = new QueryModifier();
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#getConsecutiveSolrQuery()};
+     * final {@link SolrQuery} query = {@link SolrQueryFactory#getDefaultSolrQuery()};
      * query.addField("test", new String[] {"test1", "test2"}, mod);
      * query.toString(); // test:(test1 test2)
      * </pre>
@@ -57,7 +60,7 @@ public final class QueryModifier {
      * And a call to addTerm would look like this:<br>
      * <pre>
      * final QueryModifier mod = new QueryModifier();
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#getConsecutiveSolrQuery()};
+     * final {@link SolrQuery} query = {@link SolrQueryFactory#getDefaultSolrQuery()};
      * query.addArgument("test", mod);
      * query.toString(); // test
      * </pre>
@@ -79,7 +82,7 @@ public final class QueryModifier {
      * A call to addField would for example look like this:<br>
      * <pre>
      * final QueryModifier mod = new QueryModifier({@link TermModifier#REQUIRED});
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#getConsecutiveSolrQuery()};
+     * final {@link SolrQuery} query = {@link SolrQueryFactory#getDefaultSolrQuery()};
      * query.addField("test", new String[] {"test1", "test2"}, mod);
      * query.toString(); // +test:(test1 test2)
      * </pre>
@@ -88,7 +91,7 @@ public final class QueryModifier {
      * And a call to addTerm would look like this:<br>
      * <pre>
      * final QueryModifier mod = new QueryModifier({@link TermModifier#REQUIRED});
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#getConsecutiveSolrQuery()};
+     * final {@link SolrQuery} query = {@link SolrQueryFactory#getDefaultSolrQuery()};
      * query.addArgument("test", mod);
      * query.toString(); // +test
      * </pre>

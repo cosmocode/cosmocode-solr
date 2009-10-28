@@ -4,7 +4,8 @@ import de.cosmocode.patterns.Immutable;
 
 /**
  * This is an immutable class that affects the addTerm and addField methods of SolrQuery.
- * Documentation for the input types is explained in the Constructors.
+ * It is for that reason just a storage class, to keep the signature of the SolrQuery methods short.
+ * Detailed documentation for the input types can be found in the constructors of this class.
  * 
  * @author olorenz
  *

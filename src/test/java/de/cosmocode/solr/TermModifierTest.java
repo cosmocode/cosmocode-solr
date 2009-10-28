@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.cosmocode.lucene.TermModifier;
+
 public class TermModifierTest {
 
     @Test

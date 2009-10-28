@@ -11,8 +11,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import de.cosmocode.lucene.AbstractLuceneQueryBuilder;
 import de.cosmocode.lucene.LuceneQueryBuilder;
 import de.cosmocode.lucene.QueryModifier;
+import de.cosmocode.lucene.TermModifier;
 
 
 /**
@@ -26,7 +28,7 @@ import de.cosmocode.lucene.QueryModifier;
  * @author olorenz
  *
  */
-class DefaultSolrQuery implements SolrQuery {
+class DefaultSolrQuery extends AbstractLuceneQueryBuilder implements SolrQuery {
     
     private String dtype;
     private final Map<String, Object> requestArguments = new HashMap<String, Object>();
@@ -255,39 +257,13 @@ class DefaultSolrQuery implements SolrQuery {
     //     addArgument-methods
     //---------------------------
     
-    // shortcuts
-    public DefaultSolrQuery and() {
-        return this.addUnescaped("AND", false);
-    }
-    public DefaultSolrQuery or() {
-        return this.addUnescaped("OR", false);
-    }
-    public DefaultSolrQuery not() {
-        return this.addUnescaped("NOT", false);
-    }
-    
-
-    @Override
-    public DefaultSolrQuery addFuzzyArgument (final String value, boolean mandatory) {
-        final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
-        return this.addFuzzyArgument(value, mod, defaultFuzzyness);
-    }
-    
-    
-    @Override
-    public DefaultSolrQuery addFuzzyArgument (final String value, boolean mandatory, double fuzzyness) {
-        final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
-        return this.addFuzzyArgument(value, mod, fuzzyness);
-    }
-    
     
     @Override
     public DefaultSolrQuery addFuzzyArgument (final String value, final QueryModifier modifier, final double fuzzyness) {
         if (fuzzyness < 0.0 || fuzzyness >= 1.0)
             throw new IllegalArgumentException("fuzzyness must be greater than equals 0 and less than 1 (i.e. 0 <= fuzzyness < 1)");
         
+        // TODO: implement isSplit() of QueryModifier
         if (StringUtils.isNotBlank(value) && modifier != null) {
             queryArguments.append(modifier.getTermPrefix());
             
@@ -298,14 +274,6 @@ class DefaultSolrQuery implements SolrQuery {
         }
         
         return this;
-    }
-
-    
-    @Override
-    public DefaultSolrQuery addArgument (final String value, final boolean mandatory) {
-        final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
-        return this.addArgument(value, mod);
     }
     
     
@@ -333,19 +301,6 @@ class DefaultSolrQuery implements SolrQuery {
     
     
     // add collection and array
-    
-    @Override
-    public DefaultSolrQuery addArgument (final Collection<?> value, final boolean mandatory) {
-        final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
-        return this.addArgumentAsCollection(value, mod);
-    }
-    
-    
-    @Override
-    public <K> DefaultSolrQuery addArgument (final K[] values, final QueryModifier modifiers) {
-        return this.addArgumentAsArray(values, modifiers);
-    }
     
     
     @Override
@@ -425,24 +380,6 @@ class DefaultSolrQuery implements SolrQuery {
     }
     
     
-    @Override
-    public DefaultSolrQuery addArgument (final Object value, final QueryModifier modifiers) {
-        if (value == null) return this;
-        
-        if (value instanceof String) {
-            return this.addArgument(value.toString(), modifiers);
-        } else if (value instanceof Collection<?>) {
-            return this.addArgumentAsCollection((Collection<?>)value, modifiers);
-        } else if (value.getClass().isArray()) { 
-            return this.addArgumentAsArray(value, modifiers);
-        } else if (value instanceof DefaultSolrQuery) {
-            return this.addSubquery((DefaultSolrQuery)value, modifiers);
-        } else {
-            return this.addArgument(value.toString(), modifiers);
-        }
-    }
-    
-    
     
     @Override
     public DefaultSolrQuery addSubquery (final LuceneQueryBuilder value, final boolean mandatory) {
@@ -500,7 +437,6 @@ class DefaultSolrQuery implements SolrQuery {
     //---------------------------
     
     
-    @Override
     public DefaultSolrQuery addField (final String key, final Object value, final QueryModifier modifiers) {
         if (value instanceof Collection<?>) {
             return this.addFieldAsCollection(key, (Collection<?>)value, modifiers);
@@ -518,20 +454,6 @@ class DefaultSolrQuery implements SolrQuery {
         }
         
         return this;
-    }
-    
-    
-    @Override
-    public DefaultSolrQuery addField (final String key, final String value, final boolean mandatoryKey) {
-        final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
-        return this.addField(key, value, mod);
-    }
-    
-    
-    @Override
-    public DefaultSolrQuery addField (String key, String value, boolean mandatoryKey, double boostFactor) {
-        return this.addField(key, value, mandatoryKey).addBoost(boostFactor);
     }
     
     
@@ -555,15 +477,28 @@ class DefaultSolrQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey) {
-        return this.addFuzzyField(key, value, mandatoryKey, defaultFuzzyness);
+    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness) {
+        if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
+            this.startField(key, mandatoryKey);
+            this.addFuzzyArgument(value, false, fuzzyness);
+            if (value.contains(" ")) {
+                queryArguments.append("(");
+                for (String token : value.split(" ")) {
+                    this.addFuzzyArgument(token, false, fuzzyness);
+                }
+                queryArguments.append(")^0.5");
+            }
+            this.endField();
+        }
+        
+        return this;
     }
     
     
     @Override
-    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyField (final String key, final String value, final QueryModifier modifier, final double fuzzyness) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
-            this.startField(key, mandatoryKey);
+            this.startField(key, modifier);
             this.addFuzzyArgument(value, false, fuzzyness);
             if (value.contains(" ")) {
                 queryArguments.append("(");
@@ -589,18 +524,6 @@ class DefaultSolrQuery implements SolrQuery {
         
         return this;
     }
-    
-    
-    @Override
-    public DefaultSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor) {
-        return this.addField(key, mandatoryKey, value, mandatoryValue).addBoost(boostFactor);
-    }
-    
-    
-    @Override
-    public <K> DefaultSolrQuery addField (final String key, final K[] value, final QueryModifier modifiers) {
-        return this.addFieldAsArray(key, value, modifiers);
-    }
 
     
     @Override
@@ -612,12 +535,6 @@ class DefaultSolrQuery implements SolrQuery {
         }
         
         return this;
-    }
-    
-    
-    @Override
-    public DefaultSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers, final double boost) {
-        return this.addFieldAsCollection(key, value, modifiers).addBoost(boost);
     }
     
     
@@ -760,72 +677,6 @@ class DefaultSolrQuery implements SolrQuery {
                 input
             ).replaceAll("")
         ).replaceAll("\\\\$0");
-    }
-
-
-    // TODO: move into (new) AbstractLuceneQueryBuilder and implement these methods
-    
-    @Override
-    public SolrQuery addFieldAsCollection(String key, Collection<?> value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addFuzzyArgument(String value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addFuzzyArgument(String value, QueryModifier modifiers) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addFuzzyField(String key, String value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addFuzzyField(String key, String value, QueryModifier mod) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addFuzzyField(String key, String value, QueryModifier mod,
-            double fuzzyness) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SolrQuery addSubquery(LuceneQueryBuilder value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public QueryModifier getDefaultQueryModifier() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public void setDefaultQueryModifier(QueryModifier mod) {
-        // TODO Auto-generated method stub
-        
     }
     
 

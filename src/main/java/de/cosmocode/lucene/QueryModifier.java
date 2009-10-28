@@ -3,7 +3,6 @@ package de.cosmocode.lucene;
 import de.cosmocode.patterns.Immutable;
 import de.cosmocode.solr.SolrQuery;
 import de.cosmocode.solr.SolrQueryFactory;
-import de.cosmocode.solr.TermModifier;
 
 /**
  * This is an immutable class that affects the addTerm and addField methods of SolrQuery.

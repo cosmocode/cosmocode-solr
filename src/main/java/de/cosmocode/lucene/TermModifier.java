@@ -1,4 +1,4 @@
-package de.cosmocode.solr;
+package de.cosmocode.lucene;
 
 public enum TermModifier {
     

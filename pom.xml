@@ -35,5 +35,10 @@
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>de.cosmocode</groupId>
+    	<artifactId>cosmocode-patterns</artifactId>
+    	<version>1.1</version>
+    </dependency>
   </dependencies>
 </project>

@@ -4,6 +4,10 @@ import java.util.Collection;
 
 public interface SolrQueryBuilder {
     
+    public static final int MAX = 10000000;
+    
+    // TODO: JavaDoc
+    
     
     //---------------------------
     //     addFuzzyArgument

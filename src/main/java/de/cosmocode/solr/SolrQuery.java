@@ -125,7 +125,7 @@ public interface SolrQuery extends SolrQueryBuilder {
     
 
     /**
-     * @return the dtype
+     * @return the data type, stored in the field "dtype_s". 
      */
     public String getDtype();
     

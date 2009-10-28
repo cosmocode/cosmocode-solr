@@ -25,8 +25,6 @@ import org.apache.log4j.Logger;
  */
 class ConsecutiveSolrQuery implements SolrQuery {
     
-    public static final int MAX = 10000000;
-    
     private String dtype;
     private final StringBuilder queryArguments;
     private boolean wildCarded;
@@ -35,7 +33,6 @@ class ConsecutiveSolrQuery implements SolrQuery {
     private static final Logger logger = Logger.getLogger(ConsecutiveSolrQuery.class);
     public static final double defaultFuzzyness = 0.5;
     
-    public static final QueryModifier defaultModifier = new QueryModifier();
     
     /**
      * This one should be used for subqueries only.
@@ -47,6 +44,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
         this.setWildCarded(true);
     }
     
+    
     /**
      * Constructs a new SolrQuery from the given DType (DataType).
      * @param dtype
@@ -54,6 +52,7 @@ class ConsecutiveSolrQuery implements SolrQuery {
     public ConsecutiveSolrQuery (final String dtype) {
         this (dtype, true);
     }
+    
     
     /**
      * Constructs a new SolrQuery from the given DType (DataType),false
@@ -418,6 +417,25 @@ class ConsecutiveSolrQuery implements SolrQuery {
     
     
     @Override
+    public ConsecutiveSolrQuery addArgument (final Object value, final QueryModifier modifiers) {
+        if (value == null) return this;
+        
+        if (value instanceof String) {
+            return this.addArgument(value.toString(), modifiers);
+        } else if (value instanceof Collection<?>) {
+            return this.addArgumentAsCollection((Collection<?>)value, modifiers);
+        } else if (value.getClass().isArray()) { 
+            return this.addArgumentAsArray(value, modifiers);
+        } else if (value instanceof ConsecutiveSolrQuery) {
+            return this.addSubquery((ConsecutiveSolrQuery)value, modifiers);
+        } else {
+            return this.addArgument(value.toString(), modifiers);
+        }
+    }
+    
+    
+    
+    @Override
     public ConsecutiveSolrQuery addSubquery (final SolrQuery value, final boolean mandatory) {
         if (value != null) {
             if (mandatory) queryArguments.append("+");
@@ -436,24 +454,6 @@ class ConsecutiveSolrQuery implements SolrQuery {
         }
         
         return this;
-    }
-    
-    
-    @Override
-    public ConsecutiveSolrQuery addArgument (final Object value, final QueryModifier modifiers) {
-        if (value == null) return this;
-        
-        if (value instanceof String) {
-            return this.addArgument(value.toString(), modifiers);
-        } else if (value instanceof Collection<?>) {
-            return this.addArgumentAsCollection((Collection<?>)value, modifiers);
-        } else if (value.getClass().isArray()) { 
-            return this.addArgumentAsArray(value, modifiers);
-        } else if (value instanceof ConsecutiveSolrQuery) {
-            return this.addSubquery((ConsecutiveSolrQuery)value, modifiers);
-        } else {
-            return this.addArgument(value.toString(), modifiers);
-        }
     }
     
     

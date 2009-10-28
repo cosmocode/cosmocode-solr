@@ -13,7 +13,7 @@ public final class SolrQueryFactory {
      * @return a SolrQuery which is not thread-safe
      */
     public static SolrQuery getConsecutiveSolrQuery() {
-        return new AppendingSolrQuery();
+        return new ConsecutiveSolrQuery();
     }
     
     
@@ -22,7 +22,7 @@ public final class SolrQueryFactory {
      * @param dtype the "dtype_s" field is automatically initialized with this value
      */
     public static SolrQuery getConsecutiveSolrQuery(final String dtype) {
-        return new AppendingSolrQuery(dtype);
+        return new ConsecutiveSolrQuery(dtype);
     }
     
     

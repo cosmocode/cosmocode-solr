@@ -1,10 +1,12 @@
 package de.cosmocode.solr;
 
+import de.cosmocode.solr.impl.AppendingSolrQuery;
+
 
 public final class SolrQueryFactory {
     
     
-    // just a static class
+    // this is a static class, so no constructor needed
     private SolrQueryFactory() {};
     
     
@@ -18,7 +20,7 @@ public final class SolrQueryFactory {
     
     /**
      * @return a SolrQuery which is not thread-safe
-     * @param dtype the data type that is automatically set
+     * @param dtype the "dtype_s" field is automatically initialized with this value
      */
     public static SolrQuery getConsecutiveSolrQuery(final String dtype) {
         return new AppendingSolrQuery(dtype);

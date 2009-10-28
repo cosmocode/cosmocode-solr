@@ -8,14 +8,20 @@ import java.util.Map;
  * This is a shortcut for building Solr queries. 
  * It can be directly passed to the SearchClient, which then converts it as needed.
  * </p>
+ * 
+ * @see AppendingSolrQuery
+ * @see SolrQueryFactory
+ * 
  * @author olorenz
  *
  */
 public interface SolrQuery {
     
+    // TODO: JavaDoc
+    
     
     /**
-     * @return the request arguments in a new HashMap 
+     * @return the request arguments in an immutable Map 
      * (no modifications on this SolrQuery possible)
      */
     public Map<String, Object> getRequestArguments();
@@ -25,6 +31,13 @@ public interface SolrQuery {
      * @return the query which was built with the add...-methods
      */
     public String getQuery();
+    
+    
+    
+    
+    //---------------------------
+    //     addFuzzyArgument
+    //---------------------------
 
     
     /**
@@ -63,6 +76,12 @@ public interface SolrQuery {
     public SolrQuery addFuzzyArgument (final String value, final QueryModifier modifiers, final double fuzzyness);
 
     
+    
+    //---------------------------
+    //     addArgument
+    //---------------------------
+    
+    
     /**
      * 
      * @param value
@@ -89,8 +108,6 @@ public interface SolrQuery {
     public SolrQuery addArgument (final Object value, final QueryModifier modifiers);
     
     
-    // add collection and array
-    
     /**
      * @param value
      * @param mandatory
@@ -106,6 +123,12 @@ public interface SolrQuery {
      * @return this
      */
     public <K> SolrQuery addArgument (final K[] values, final QueryModifier modifiers);
+    
+    
+    
+    //---------------------------
+    //     addArgumentAs...
+    //---------------------------
     
     
     /**
@@ -135,12 +158,10 @@ public interface SolrQuery {
     public SolrQuery addArgumentAsArray (Object values, final QueryModifier modifiers);
     
     
-    /**
-     * @param value
-     * @param mandatory
-     * @return this
-     */
-    public SolrQuery addSubquery (final AppendingSolrQuery value, final boolean mandatory);
+    
+    //---------------------------
+    //     addSubquery
+    //---------------------------
     
     
     /**
@@ -148,7 +169,15 @@ public interface SolrQuery {
      * @param mandatory
      * @return this
      */
-    public SolrQuery addSubquery (final AppendingSolrQuery value, final QueryModifier modifiers);
+    public SolrQuery addSubquery (final SolrQuery value, final boolean mandatory);
+    
+    
+    /**
+     * @param value
+     * @param mandatory
+     * @return this
+     */
+    public SolrQuery addSubquery (final SolrQuery value, final QueryModifier modifiers);
     
     
     
@@ -183,7 +212,7 @@ public interface SolrQuery {
     
     
     //---------------------------
-    //     addField-methods
+    //     addField
     //---------------------------
     
     
@@ -205,6 +234,20 @@ public interface SolrQuery {
      * @return this
      */
     public SolrQuery addField (final String key, final String value, final boolean mandatoryKey);
+    
+    
+    /**
+     * Append a field with a string value, and apply a boost afterwards 
+     * 
+     * @see SolrQuery#addField(String, String, boolean)
+     * 
+     * @param key
+     * @param value
+     * @param mandatoryKey
+     * @param boostFactor
+     * @return this
+     */
+    public SolrQuery addField (String key, String value, boolean mandatoryKey, double boostFactor);
     
     
     /**
@@ -230,6 +273,22 @@ public interface SolrQuery {
     
     
     /**
+     * Append a field with a collection of values, and apply a boost afterwards 
+     * 
+     * @see SolrQuery#addField(String, boolean, Collection, boolean)
+     * 
+     * @param key
+     * @param mandatoryKey
+     * @param value
+     * @param mandatoryValue
+     * @param boostFactor
+     * @return this
+     */
+    public SolrQuery addField (final String key, final boolean mandatoryKey, final Collection<?> value, final boolean mandatoryValue, final double boostFactor);
+
+    
+    
+    /**
      * 
      * @param <K>
      * @param key
@@ -239,6 +298,12 @@ public interface SolrQuery {
      * @return this
      */
     public <K> SolrQuery addField (final String key, final K[] value, final QueryModifier modifiers);
+    
+    
+
+    //---------------------------
+    //     addFuzzyField
+    //---------------------------
     
     
     /**
@@ -266,9 +331,10 @@ public interface SolrQuery {
      */
     public SolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness);
 
+    
 
     //---------------------------
-    //     addFieldAs...-methods
+    //     addFieldAs...
     //---------------------------
     
     /**
@@ -281,6 +347,21 @@ public interface SolrQuery {
      * @return this
      */
     public SolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers);
+    
+    
+    /**
+     * Append a field with a collection of values, and apply a boost afterwards 
+     * 
+     * @see SolrQuery#addFieldAsCollection(String, Collection, QueryModifier)
+     * 
+     * @param key
+     * @param mandatoryKey
+     * @param value
+     * @param mandatoryValue
+     * @param boostFactor
+     * @return this
+     */
+    public SolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers, final double boost);
     
     
     /**
@@ -307,16 +388,10 @@ public interface SolrQuery {
     public SolrQuery addFieldAsArray (final String key, final Object value, final QueryModifier modifiers);
     
     
-    /**
-     * Starts a field with `key`:(.<br>
-     * <b>Attention</b>: Use this method carefully and end all fields with 
-     * {@link SolrQuery#endField()},
-     * or otherwise you get Solr-Exceptions on execution.
-     * @param fieldName the name of the field; omitted if null
-     * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
-     * @return this
-     */
-    public AppendingSolrQuery startField (final String fieldName, final boolean mandatory);
+    
+    //---------------------------------------
+    //    startField, endField, addBoost
+    //---------------------------------------
     
     
     /**
@@ -328,7 +403,19 @@ public interface SolrQuery {
      * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
      * @return this
      */
-    public AppendingSolrQuery startField (final String fieldName, final QueryModifier modifiers);
+    public SolrQuery startField (final String fieldName, final boolean mandatory);
+    
+    
+    /**
+     * Starts a field with `key`:(.<br>
+     * <b>Attention</b>: Use this method carefully and end all fields with 
+     * {@link SolrQuery#endField()},
+     * or otherwise you get Solr-Exceptions on execution.
+     * @param fieldName the name of the field; omitted if null
+     * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
+     * @return this
+     */
+    public SolrQuery startField (final String fieldName, final QueryModifier modifiers);
     
     
     /**
@@ -338,7 +425,7 @@ public interface SolrQuery {
      * or otherwise you get Solr-Exceptions on execution.
      * @return this
      */
-    public AppendingSolrQuery endField ();
+    public SolrQuery endField ();
     
     
     /**
@@ -348,6 +435,6 @@ public interface SolrQuery {
      * @param boostFactor a positive double < 10.000.000 which boosts the previously added element
      * @return this
      */
-    public AppendingSolrQuery addBoost (final double boostFactor);
+    public SolrQuery addBoost (final double boostFactor);
 
 }

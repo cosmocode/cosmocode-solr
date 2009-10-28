@@ -1,4 +1,4 @@
-package de.cosmocode.solr;
+package de.cosmocode.solr.impl;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -10,6 +10,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
+import de.cosmocode.solr.QueryModifier;
+import de.cosmocode.solr.SolrQuery;
+import de.cosmocode.solr.TermModifier;
 
 /**
  * <p>
@@ -449,10 +453,10 @@ public class AppendingSolrQuery implements SolrQuery {
     
     
     @Override
-    public AppendingSolrQuery addSubquery (final AppendingSolrQuery value, final boolean mandatory) {
+    public AppendingSolrQuery addSubquery (final SolrQuery value, final boolean mandatory) {
         if (value != null) {
             if (mandatory) queryArguments.append("+");
-            queryArguments.append("(").append(value.queryArguments).append(") ");
+            queryArguments.append("(").append(value.getQuery()).append(") ");
         }
         
         return this;
@@ -460,10 +464,10 @@ public class AppendingSolrQuery implements SolrQuery {
     
     
     @Override
-    public AppendingSolrQuery addSubquery (final AppendingSolrQuery value, final QueryModifier modifiers) {
+    public AppendingSolrQuery addSubquery (final SolrQuery value, final QueryModifier modifiers) {
         if (value != null) {
             queryArguments.append(modifiers.getTermPrefix());
-            queryArguments.append("(").append(value.queryArguments).append(") ");
+            queryArguments.append("(").append(value.getQuery()).append(") ");
         }
         
         return this;
@@ -551,17 +555,7 @@ public class AppendingSolrQuery implements SolrQuery {
     }
     
     
-    /**
-     * Append a field with a string value, and apply a boost afterwards 
-     * 
-     * @see SolrQuery#addField(String, String, boolean)
-     * 
-     * @param key
-     * @param value
-     * @param mandatoryKey
-     * @param boostFactor
-     * @return this
-     */
+    @Override
     public AppendingSolrQuery addField (String key, String value, boolean mandatoryKey, double boostFactor) {
         return this.addField(key, value, mandatoryKey).addBoost(boostFactor);
     }
@@ -623,18 +617,7 @@ public class AppendingSolrQuery implements SolrQuery {
     }
     
     
-    /**
-     * Append a field with a collection of values, and apply a boost afterwards 
-     * 
-     * @see SolrQuery#addField(String, boolean, Collection, boolean)
-     * 
-     * @param key
-     * @param mandatoryKey
-     * @param value
-     * @param mandatoryValue
-     * @param boostFactor
-     * @return this
-     */
+    @Override
     public AppendingSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor) {
         return this.addField(key, mandatoryKey, value, mandatoryValue).addBoost(boostFactor);
     }
@@ -658,18 +641,7 @@ public class AppendingSolrQuery implements SolrQuery {
     }
     
     
-    /**
-     * Append a field with a collection of values, and apply a boost afterwards 
-     * 
-     * @see SolrQuery#addFieldAsCollection(String, Collection, QueryModifier)
-     * 
-     * @param key
-     * @param mandatoryKey
-     * @param value
-     * @param mandatoryValue
-     * @param boostFactor
-     * @return this
-     */
+    @Override
     public AppendingSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers, final double boost) {
         return this.addFieldAsCollection(key, value, modifiers).addBoost(boost);
     }

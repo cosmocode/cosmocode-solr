@@ -13,7 +13,7 @@ import de.cosmocode.patterns.Immutable;
 @Immutable
 public final class QueryModifier {
     
-    // TODO: Javadoc
+    // TODO: full JavaDoc
     
     private final TermModifier termModifier;
     

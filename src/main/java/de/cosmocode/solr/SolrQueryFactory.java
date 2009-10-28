@@ -1,7 +1,5 @@
 package de.cosmocode.solr;
 
-
-
 public final class SolrQueryFactory {
     
     
@@ -23,15 +21,6 @@ public final class SolrQueryFactory {
      */
     public static SolrQuery getConsecutiveSolrQuery(final String dtype) {
         return new ConsecutiveSolrQuery(dtype);
-    }
-    
-    
-    /**
-     * <b>Attention</b>: This method is not yet implemented.
-     * @return a concurrent SolrQuery, which can be shared across threads.
-     */
-    public SolrQuery getConcurrentSolrQuery() {
-        throw new UnsupportedOperationException("not yet implemented");
     }
     
 

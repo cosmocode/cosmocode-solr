@@ -15,7 +15,9 @@ import java.util.Set;
  * @author olorenz
  *
  */
-public interface SolrQuery extends SolrQueryBuilder {
+public interface SolrQuery extends LuceneQueryBuilder {
+    
+    public static final int MAX = 10000000;
     
     // TODO: JavaDoc
     
@@ -135,12 +137,6 @@ public interface SolrQuery extends SolrQueryBuilder {
      * (no modifications on this SolrQuery possible)
      */
     public Map<String, Object> getRequestArguments();
-    
-    
-    /**
-     * @return the query which was built with the add...-methods
-     */
-    public String getQuery();
     
 
 }

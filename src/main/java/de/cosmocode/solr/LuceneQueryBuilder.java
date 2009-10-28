@@ -2,28 +2,76 @@ package de.cosmocode.solr;
 
 import java.util.Collection;
 
-public interface SolrQueryBuilder {
+public interface LuceneQueryBuilder {
     
-    public static final int MAX = 10000000;
+    /**
+     * The default fuzzyness. It is used by
+     * <ul>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String)}</li>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String, boolean)}</li>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyArgument(String, QueryModifier)}</li>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String)}</li>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String, boolean)}</li>
+     *  <li> {@link LuceneQueryBuilder#addFuzzyField(String, String, QueryModifier)}</li>
+     * </ul>
+     */
+    public static final double defaultFuzzyness = 0.5;
     
     // TODO: JavaDoc
+    
+    
+    /**
+     * Sets a default QueryModifier that is used
+     * whenever a method is invoked without a QueryModifier parameter.
+     */
+    public void setDefaultQueryModifier(final QueryModifier mod);
+    
+    
+    /**
+     * Gets the default QueryModifier that is used
+     * whenever a method is invoked without a QueryModifier parameter.
+     * 
+     * @return the default QueryModifier
+     */
+    public QueryModifier getDefaultQueryModifier();
+    
+    
+    /**
+     * @return the query which was built with the add...-methods
+     */
+    public String getQuery();
     
     
     //---------------------------
     //     addFuzzyArgument
     //---------------------------
+    
+    
+    /**
+     * Append a fuzzy term. <br>
+     * fuzzy searches include terms that are in the levenshtein distance of the searched term.
+     * <br><br>
+     * This method uses the {@link #getDefaultQueryModifier()} and {@link #defaultFuzzyness}.
+     * 
+     * @param value the value to search for
+     * @return this
+     */
+    public SolrQuery addFuzzyArgument (final String value);
 
     
     /**
-     * Append a fuzzy argument with default fuzzyness of 0.5. <br>
-     * fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * Append a fuzzy term with default fuzzyness of 0.5. <br>
+     * fuzzy searches include terms that are in the levenshtein distance of the searched term.
+     * <br><br>
+     * This method uses the {@link #defaultFuzzyness}.
      * 
-     * @see #addFuzzyArgument(String, double, boolean)
+     * @see #addFuzzyArgument(String, boolean, double)
      * @param value the value to search for
      * @param mandatory if true then the value must be found, otherwise it is just prioritized in the search results
      * @return this
      */
-    public SolrQuery addFuzzyArgument (final String value, boolean mandatory);
+    @Deprecated
+    public SolrQuery addFuzzyArgument (final String value, final boolean mandatory);
     
     
     /**
@@ -35,7 +83,22 @@ public interface SolrQueryBuilder {
      * @param mandatory if true then the value must be found, otherwise it is just prioritized in the search results
      * @return this
      */
-    public SolrQuery addFuzzyArgument (final String value, boolean mandatory, double fuzzyness);
+    @Deprecated
+    public SolrQuery addFuzzyArgument (final String value, final boolean mandatory, final double fuzzyness);
+    
+    
+    /**
+     * Append a fuzzy argument with the given fuzzyness. <br>
+     * fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * <br><br>
+     * This method uses the {@link #defaultFuzzyness}.
+     * 
+     * @param value the value to search for
+     * @param fuzzyness the fuzzyness; must be between 0 (inclusive) and 1 (exclusive), so that: 0 <= fuzzyness < 1
+     * @param mandatory if true then the value must be found, otherwise it is just prioritized in the search results
+     * @return this
+     */
+    public SolrQuery addFuzzyArgument (final String value, final QueryModifier modifiers);
     
     
     /**
@@ -152,6 +215,14 @@ public interface SolrQueryBuilder {
      * @return this
      */
     public SolrQuery addSubquery (final SolrQuery value, final QueryModifier modifiers);
+    
+    
+    /**
+     * This method adds a SolrQuery as 
+     * @param value
+     * @return
+     */
+    public SolrQuery addSubquery (final SolrQuery value);
     
     
     
@@ -281,6 +352,22 @@ public interface SolrQueryBuilder {
     
     
     /**
+     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
+     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
+     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
+     * <br><br>
+     * This method uses the {@link #getDefaultQueryModifier()}.
+     * 
+     * @param key the name of the field
+     * @param value the value to search for
+     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
+     * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
+     * @return this
+     */
+    public SolrQuery addFuzzyField (final String key, final String value);
+    
+    
+    /**
      * Append a fuzzy search argument with default fuzzyness (0.5) for the given field. <br>
      * fuzzy searches include arguments that are in the levenshtein distance of the searched term.
      * 
@@ -289,6 +376,7 @@ public interface SolrQueryBuilder {
      * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
      * @return this
      */
+    @Deprecated
     public SolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey);
     
     
@@ -303,13 +391,65 @@ public interface SolrQueryBuilder {
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
+    @Deprecated
     public SolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness);
+    
+    
+    /**
+     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
+     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
+     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
+     * 
+     * @param key the name of the field
+     * @param value the value to search for
+     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
+     * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
+     * @return this
+     */
+    public SolrQuery addFuzzyField (final String key, final String value, final QueryModifier mod);
+    
+    
+    /**
+     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
+     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
+     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
+     * 
+     * @param key the name of the field
+     * @param value the value to search for
+     * @param mod the modifiers to use
+     * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
+     * @return this
+     */
+    public SolrQuery addFuzzyField (final String key, final String value, final QueryModifier mod, final double fuzzyness);
 
     
 
     //---------------------------
     //     addFieldAs...
     //---------------------------
+    
+    /**
+     * Adds a field named `key`, with the values of `value`.
+     * <br>Example:
+     * <pre>
+     *   LuceneQueryBuilder builder = SolrQueryFactory.getConsecutiveSolrQuery();  // or any other implementation
+     *   builder.setDefaultQueryModifier(
+     *   List&lt;String&gt; values = new ArrayList&lt;String&gt;();
+     *   values.add("test1");
+     *   values.add("test2");
+     *   builder.addFieldAsCollection("test", values);
+     *   builder.getQuery();  // +
+     * </pre>
+     * 
+     * @param key
+     * @param mandatoryKey
+     * @param value
+     * @param mandatoryValue
+     * @param boostFactor
+     * @return this
+     */
+    public SolrQuery addFieldAsCollection (final String key, final Collection<?> value);
+    
     
     /**
      * 

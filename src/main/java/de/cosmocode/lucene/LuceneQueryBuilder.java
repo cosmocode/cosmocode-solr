@@ -598,7 +598,7 @@ public interface LuceneQueryBuilder {
      * @param key
      * @param value
      * @param modifier
-     * @return
+     * @return this
      */
     public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier);
     
@@ -612,7 +612,7 @@ public interface LuceneQueryBuilder {
      * @param value
      * @param modifier
      * @param boost
-     * @return
+     * @return this
      */
     public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier, double boost);
     
@@ -624,8 +624,7 @@ public interface LuceneQueryBuilder {
      * @param <K>
      * @param key
      * @param value
-     * @param modifier
-     * @return
+     * @return this
      */
     public <K> LuceneQueryBuilder addFieldAsArray (String key, K[] value);
     
@@ -638,7 +637,7 @@ public interface LuceneQueryBuilder {
      * @param key
      * @param value
      * @param modifier
-     * @return
+     * @return this
      */
     public <K> LuceneQueryBuilder addFieldAsArray (String key, K[] value, QueryModifier modifier);
     
@@ -650,7 +649,7 @@ public interface LuceneQueryBuilder {
      * @param key
      * @param value
      * @param modifier
-     * @return
+     * @return this
      */
     public LuceneQueryBuilder addFieldAsArray (String key, Object value);
     
@@ -662,7 +661,7 @@ public interface LuceneQueryBuilder {
      * @param key
      * @param value
      * @param modifier
-     * @return
+     * @return this
      */
     public LuceneQueryBuilder addFieldAsArray (String key, Object value, QueryModifier modifier);
     

@@ -9,18 +9,18 @@ public final class SolrQueryFactory {
     
     
     /**
-     * @return a SolrQuery which uses a StringBuilder and is not thread-safe
+     * @return a SolrQuery which is not thread-safe
      */
-    public static SolrQuery getAppendingSolrQuery() {
+    public static SolrQuery getConsecutiveSolrQuery() {
         return new AppendingSolrQuery();
     }
     
     
     /**
-     * @return a SolrQuery which uses a StringBuilder and is not thread-safe
+     * @return a SolrQuery which is not thread-safe
      * @param dtype the data type that is automatically set
      */
-    public static SolrQuery getAppendingSolrQuery(final String dtype) {
+    public static SolrQuery getConsecutiveSolrQuery(final String dtype) {
         return new AppendingSolrQuery(dtype);
     }
     

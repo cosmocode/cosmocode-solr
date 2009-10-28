@@ -11,7 +11,7 @@ public enum TermModifier {
      * then all documents stored in the lucene/solr index 
      * <br> <br>
      * The implementation should prepend nothing to the Term/Field,
-     * or use the method getModifier-method.
+     * or use {@link TermModifier#getModifier()}.
      */
     NONE(""),
     
@@ -22,7 +22,7 @@ public enum TermModifier {
      * The returned list is therefore limited to these documents.
      * <br> <br>
      * The implementation should prepend a "+" to the Term/Field,
-     * or use the method getModifier-method.
+     * or use {@link TermModifier#getModifier()}.
      */
     REQUIRED("+"),
     
@@ -32,7 +32,7 @@ public enum TermModifier {
      * are in the returned result list.
      * <br> <br>
      * The implementation should prepend a "-" to the Term/Field,
-     * or use the method getModifier-method.
+     * or use {@link TermModifier#getModifier()}.
      */
     PROHIBITED("-"),
     

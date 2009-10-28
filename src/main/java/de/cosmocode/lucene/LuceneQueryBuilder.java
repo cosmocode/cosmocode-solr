@@ -542,8 +542,7 @@ public interface LuceneQueryBuilder {
      * 
      * @param key the name of the field
      * @param value the value to search for
-     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
-     * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
+     * @param mod the modifiers to use
      * @return this
      */
     public LuceneQueryBuilder addFuzzyField (String key, String value, QueryModifier mod);
@@ -581,11 +580,8 @@ public interface LuceneQueryBuilder {
      *   builder.getQuery();  // +
      * </pre>
      * 
-     * @param key
-     * @param mandatoryKey
-     * @param value
-     * @param mandatoryValue
-     * @param boostFactor
+     * @param key the name of the field
+     * @param value the collection of values for the field
      * @return this
      */
     public LuceneQueryBuilder addFieldAsCollection (String key, Collection<?> value);
@@ -658,7 +654,7 @@ public interface LuceneQueryBuilder {
      * Add a field with the name `key` to the query.
      * The values to search for are given in an array.
      * 
-     * @param key
+     * @param key the name of the field
      * @param value
      * @param modifier
      * @return this
@@ -690,7 +686,7 @@ public interface LuceneQueryBuilder {
      * {@link LuceneQueryBuilder#endField()},
      * or otherwise you get Solr-Exceptions on execution.
      * @param fieldName the name of the field; omitted if null
-     * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
+     * @param modifier the modifiers for the field (see QueryModifier for more details)
      * @return this
      */
     public LuceneQueryBuilder startField (String fieldName, QueryModifier modifier);

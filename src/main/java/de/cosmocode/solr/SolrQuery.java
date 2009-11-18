@@ -20,75 +20,101 @@ import de.cosmocode.lucene.LuceneQuery;
 public interface SolrQuery extends LuceneQuery {
     
     // TODO: find out real max value
+    
     /**
      * This is the maximum value for "max" that solr can handle, which is {@value}.
      */
-    public static final int MAX = 10000000;
+    int MAX = 10000000;
     
     
     /**
-     * @return the selected fields for the query - cannot be null, but "*" indicates that all are selected.
+     * Returns the selected fields for the query - cannot be null, but "*" indicates that all are selected.
+     * @return the selected fields for the query - cannot be null, but "*" indicates that all are selected
      */
-    public String getSelectFields();
+    String getSelectFields();
     
     
     /**
+     * Set the fields returned by the query - can be null; null indicates that all are selected.
      * @param fields the fields returned by the query - can be null; null indicates that all are selected.
      */
-    public void selectFields(final String... fields);
+    void selectFields(final String... fields);
     
 
     /**
+     * Returns the fields on which the result is sorted on - can be null.
      * @return the fields on which the result is sorted on - can be null.
      */
-    public String getSortFields();
+    String getSortFields();
     
 
     /**
+     * Set the sort fields on which the documents are sorted on.
+     * The syntax is SQL style (e.g. "field1 desc", "field2 asc", ...). 
      * @param sortFields the fields on which the result is sorted on - can be null.
      */
-    public void sortFields(String... sortFields);
+    void sortFields(String... sortFields);
     
 
     /**
+     * Returns the maximum number of results/documents that this query will return.
+     * 
+     * @see SolrQuery#getRows()
      * @return the maximum number of results/documents that this query will return.
      */
-    public int getMax();
+    int getMax();
     
 
-    /** 
+    /**
+     * Sets the maximum number of results/documents that this query will return.
+     * <br>The maximum value is {@link #MAX}
      * @param max the maximum number of results/documents that this query will return.
+     * 
+     * @see #setRows(int)
      */
-    public void setMax(final int max);
+    void setMax(final int max);
     
 
     /**
+     * Returns the maximum number of results/documents that this query will return.
+     * 
+     * @see #getMax()
      * @return the maximum number of results/documents that this query will return.
      */
-    public int getRows();
+    int getRows();
     
 
     /**
+     * Sets the maximum number of results/documents that this query will return.
+     * <br>The maximum value is {@link #MAX}
      * @param rows the maximum number of results/documents that this query will return.
+     * 
+     * @see #setMax(int)
      */
-    public void setRows(final int rows);
+    void setRows(final int rows);
     
 
     /**
+     * Returns the number of the first element returned.
+     * <br>The returned number is always a non-negative integer.
      * @return the number of the first element returned
      */
-    public int getStart();
+    int getStart();
     
 
     /**
-     * @param start the number of the first element returned
+     * Sets the index of the first element returned.
+     * <br>If start is less than 0 or greater than {@value #MAX} then an {@link IllegalArgumentException}
+     *   is thrown. 
+     * @param start the index of the first element returned
      */
-    public void setStart(final int start);
+    void setStart(final int start);
     
     
     /**
      * Directly set a request argument.
-     * <h4>The following request argument names are not allowed and must be set through their setters (or other methods):</h4>
+     * <h4>The following request argument names are not allowed
+     *    and must be set through their setters (or other methods):</h4>
      * <ul>
      * <li>q  --  use the addArgument-, addArrayArgument-, addUnescaped-, addField- and addFieldAsArray-methods
      * <li>start  --  {@link #setStart(int)}
@@ -97,7 +123,7 @@ public interface SolrQuery extends LuceneQuery {
      * @param name the name of the request argument; must not be one of: q, start, rows
      * @param value the value of that argument
      */
-    public void setRequestArgument(final String name, final String value);
+    void setRequestArgument(final String name, final String value);
     
     
     /**
@@ -106,7 +132,7 @@ public interface SolrQuery extends LuceneQuery {
      * It can be fetched from a SearchResult via the getFacetFields() method.
      * @param facetFieldName the facet field to add to this query; null is omitted
      */
-    public void addFacetField (final String facetFieldName);
+    void addFacetField(final String facetFieldName);
     
     
     /**
@@ -115,20 +141,22 @@ public interface SolrQuery extends LuceneQuery {
      * It can be fetched from a SearchResult via the getFacetFields() method.
      * @param facetFields the facet fields to add to this query; null is omitted
      */
-    public void addFacetFields (final String... facetFields);
+    void addFacetFields(final String... facetFields);
     
     
     /**
+     * Returns the keys of the request arguments.
      * @return the keys of the request arguments
      */
-    public Set<Map.Entry<String, Object>> getRequestArgumentSet();
+    Set<Map.Entry<String, Object>> getRequestArgumentSet();
     
     
     /**
-     * @return the request arguments in an immutable Map 
-     * (no modifications on this SolrQuery possible)
+     * Returns the request arguments in an immutable Map.
+     * <br>That means that no modifications on this SolrQuery are possible through this method.
+     * @return the request arguments
      */
-    public Map<String, Object> getRequestArguments();
+    Map<String, Object> getRequestArguments();
     
 
 }

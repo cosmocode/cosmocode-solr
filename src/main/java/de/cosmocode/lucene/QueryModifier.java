@@ -15,15 +15,8 @@ import de.cosmocode.solr.SolrQueryFactory;
 @Immutable
 public final class QueryModifier {
     
-    // TODO: full JavaDoc
     
-    private final TermModifier termModifier;
-    
-    private final boolean disjunct;
-    
-    private final boolean wildcarded;
-    
-    private final boolean split;
+    // TODO: redesign with Builder pattern
     
     
     /**
@@ -40,6 +33,14 @@ public final class QueryModifier {
      * This is a static shortcut to: <code>new QueryModifier(TermModifier.NONE)</code>.
      */
     public static final QueryModifier NONE = new QueryModifier(TermModifier.NONE);
+    
+    private final TermModifier termModifier;
+    
+    private final boolean disjunct;
+    
+    private final boolean wildcarded;
+    
+    private final boolean split;
     
     
     /**
@@ -105,7 +106,7 @@ public final class QueryModifier {
     
 
     /**
-     * This constructor sets all values to their explicitly given values
+     * This constructor sets all values to their explicitly given values.
      * @param termModifier the term modifier
      */
     public QueryModifier(final TermModifier termModifier, final boolean disjunct,
@@ -124,7 +125,7 @@ public final class QueryModifier {
      * and affects the number and content of documents returned.
      * 
      * @see TermModifier
-     * @return
+     * @return the term prefix for the Term
      */
     public String getTermPrefix() {
         return termModifier.getModifier();

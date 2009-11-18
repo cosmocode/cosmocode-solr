@@ -1,11 +1,16 @@
 package de.cosmocode.solr;
 
-
+/**
+ * This Factory creates {@link SolrQuery}s.
+ * 
+ * @author olorenz
+ */
 public final class SolrQueryFactory {
     
     
     // this is a static class, so no constructor needed
-    private SolrQueryFactory() {};
+    private SolrQueryFactory() {
+    }
     
     
     /**

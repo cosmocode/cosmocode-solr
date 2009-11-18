@@ -29,15 +29,18 @@ public interface LuceneQuery {
      *  <li> {@link LuceneQuery#addFuzzyField(String, String, QueryModifier)}</li>
      * </ul>
      */
-    public static final double defaultFuzzyness = 0.5;
+    double DEFAULT_FUZZYNESS = 0.5;
     
     // TODO: JavaDoc
     
 
     /**
+     * Returns true if this LuceneQuery appends a wildcard ("*") after each added argument, false otherwise.
+     * <br>
+     * <br><i>Implementation note</i>: This method should use isWildcarded() of {@link #getDefaultQueryModifier()}
      * @return true if this LuceneQuery appends a wildcard ("*") after each added argument, false otherwise 
      */
-    public boolean isWildCarded();
+    boolean isWildCarded();
     
     
     /**
@@ -51,14 +54,15 @@ public interface LuceneQuery {
      * (i.e. set a new default QueryModifier with wildcarded set to the given value).
      * @param wildCarded true to turn wildcarded behaviour on, false to turn it off.
      */
-    public void setWildCarded(final boolean wildCarded);
+    void setWildCarded(final boolean wildCarded);
     
     
     /**
      * Sets a default QueryModifier that is used
      * whenever a method is invoked without a QueryModifier parameter.
+     * @param mod the default modifier to set
      */
-    public void setDefaultQueryModifier(final QueryModifier mod);
+    void setDefaultQueryModifier(final QueryModifier mod);
     
     
     /**
@@ -67,13 +71,14 @@ public interface LuceneQuery {
      * 
      * @return the default QueryModifier
      */
-    public QueryModifier getDefaultQueryModifier();
+    QueryModifier getDefaultQueryModifier();
     
     
     /**
+     * Returns the query which was built with the add...-methods.
      * @return the query which was built with the add...-methods
      */
-    public String getQuery();
+    String getQuery();
     
     
     //---------------------------
@@ -85,26 +90,26 @@ public interface LuceneQuery {
      * Append a fuzzy term. <br>
      * fuzzy searches include terms that are in the levenshtein distance of the searched term.
      * <br><br>
-     * This method uses the {@link #getDefaultQueryModifier()} and {@link #defaultFuzzyness}.
+     * This method uses the {@link #getDefaultQueryModifier()} and {@link #DEFAULT_FUZZYNESS}.
      * 
      * @param value the value to search for
      * @return this
      */
-    public LuceneQuery addFuzzyArgument (String value);
+    LuceneQuery addFuzzyArgument(String value);
 
     
     /**
      * Append a fuzzy term with default fuzzyness of 0.5. <br>
      * fuzzy searches include terms that are in the levenshtein distance of the searched term.
      * <br><br>
-     * This method uses the {@link #defaultFuzzyness}.
+     * This method uses the {@link #DEFAULT_FUZZYNESS}.
      * 
      * @see #addFuzzyArgument(String, boolean, double)
      * @param value the value to search for
      * @param mandatory if true then the value must be found, otherwise it is just prioritized in the search results
      * @return this
      */
-    public LuceneQuery addFuzzyArgument (String value, boolean mandatory);
+    LuceneQuery addFuzzyArgument(String value, boolean mandatory);
     
     
     /**
@@ -116,20 +121,20 @@ public interface LuceneQuery {
      * @param fuzzyness the fuzzyness; must be between 0 (inclusive) and 1 (exclusive), so that: 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQuery addFuzzyArgument (String value, boolean mandatory, double fuzzyness);
+    LuceneQuery addFuzzyArgument(String value, boolean mandatory, double fuzzyness);
     
     
     /**
      * Append a fuzzy term with default fuzzyness of 0.5. <br>
      * fuzzy searches include arguments that are in the levenshtein distance of the searched term.
      * <br><br>
-     * This method uses the {@link #defaultFuzzyness}.
+     * This method uses the {@link #DEFAULT_FUZZYNESS}.
      * 
      * @param value the value to search for
      * @param modifier the QueryModifier affects the way in that the argument is added.
      * @return this
      */
-    public LuceneQuery addFuzzyArgument (String value, QueryModifier modifier);
+    LuceneQuery addFuzzyArgument(String value, QueryModifier modifier);
     
     
     /**
@@ -141,7 +146,7 @@ public interface LuceneQuery {
      * @param fuzzyness the fuzzyness; must be between 0 (inclusive) and 1 (exclusive), so that: 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQuery addFuzzyArgument (String value, QueryModifier modifier, double fuzzyness);
+    LuceneQuery addFuzzyArgument(String value, QueryModifier modifier, double fuzzyness);
 
     
     
@@ -155,7 +160,7 @@ public interface LuceneQuery {
      * @param value
      * @return this
      */
-    public LuceneQuery addArgument (String value);
+    LuceneQuery addArgument(String value);
     
     
     /**
@@ -164,7 +169,7 @@ public interface LuceneQuery {
      * @param mandatory
      * @return this
      */
-    public LuceneQuery addArgument (String value, boolean mandatory);
+    LuceneQuery addArgument(String value, boolean mandatory);
     
     
     /**
@@ -173,7 +178,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addArgument (String value, QueryModifier modifier);
+    LuceneQuery addArgument(String value, QueryModifier modifier);
     
     
     /**
@@ -181,7 +186,7 @@ public interface LuceneQuery {
      * @param values
      * @return this
      */
-    public LuceneQuery addArgument (Collection<?> values);
+    LuceneQuery addArgument(Collection<?> values);
     
     
     /**
@@ -189,7 +194,7 @@ public interface LuceneQuery {
      * @param mandatory
      * @return this
      */
-    public LuceneQuery addArgument (Collection<?> values, boolean mandatory);
+    LuceneQuery addArgument(Collection<?> values, boolean mandatory);
     
     
     /**
@@ -198,7 +203,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addArgument (Collection<?> values, QueryModifier modifier);
+    LuceneQuery addArgument(Collection<?> values, QueryModifier modifier);
     
     
     /**
@@ -207,7 +212,7 @@ public interface LuceneQuery {
      * @param values
      * @return this
      */
-    public <K> LuceneQuery addArgument (K[] values);
+    <K> LuceneQuery addArgument(K[] values);
     
     
     /**
@@ -216,7 +221,7 @@ public interface LuceneQuery {
      * @param mandatory
      * @return this
      */
-    public <K> LuceneQuery addArgument (K[] values, boolean mandatory);
+    <K> LuceneQuery addArgument(K[] values, boolean mandatory);
     
     
     /**
@@ -225,7 +230,7 @@ public interface LuceneQuery {
      * @param mandatory
      * @return this
      */
-    public <K> LuceneQuery addArgument (K[] values, QueryModifier modifier);
+    <K> LuceneQuery addArgument(K[] values, QueryModifier modifier);
     
     
     
@@ -238,7 +243,7 @@ public interface LuceneQuery {
      * @param values
      * @return this
      */
-    public LuceneQuery addArgumentAsCollection (Collection<?> values);
+    LuceneQuery addArgumentAsCollection(Collection<?> values);
     
     
     /**
@@ -247,7 +252,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addArgumentAsCollection (Collection<?> values, QueryModifier modifier);
+    LuceneQuery addArgumentAsCollection(Collection<?> values, QueryModifier modifier);
     
     
     /**
@@ -259,7 +264,7 @@ public interface LuceneQuery {
      * @param values
      * @return this
      */
-    public <K> LuceneQuery addArgumentAsArray (K[] values);
+    <K> LuceneQuery addArgumentAsArray(K[] values);
     
     
     /**
@@ -269,7 +274,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public <K> LuceneQuery addArgumentAsArray (K[] values, QueryModifier modifier);
+    <K> LuceneQuery addArgumentAsArray(K[] values, QueryModifier modifier);
     
     
     /**
@@ -280,7 +285,7 @@ public interface LuceneQuery {
      * @param values the array of terms to search for
      * @return this
      */
-    public LuceneQuery addArgumentAsArray (Object values);
+    LuceneQuery addArgumentAsArray(Object values);
     
     
     /**
@@ -290,7 +295,7 @@ public interface LuceneQuery {
      * @param modifier the modifier for the search of this term.
      * @return this
      */
-    public LuceneQuery addArgumentAsArray (Object values, QueryModifier modifier);
+    LuceneQuery addArgumentAsArray(Object values, QueryModifier modifier);
     
     
     
@@ -307,7 +312,7 @@ public interface LuceneQuery {
      * @param value the SubQuery to add
      * @return this
      */
-    public LuceneQuery addSubquery (LuceneQuery value);
+    LuceneQuery addSubquery(LuceneQuery value);
     
     
     /**
@@ -317,7 +322,7 @@ public interface LuceneQuery {
      * @param mandatory
      * @return this
      */
-    public LuceneQuery addSubquery (LuceneQuery value, boolean mandatory);
+    LuceneQuery addSubquery(LuceneQuery value, boolean mandatory);
     
     
     /**
@@ -327,7 +332,7 @@ public interface LuceneQuery {
      * @param modifiers
      * @return this
      */
-    public LuceneQuery addSubquery (LuceneQuery value, QueryModifier modifiers);
+    LuceneQuery addSubquery(LuceneQuery value, QueryModifier modifiers);
     
     
     
@@ -345,7 +350,7 @@ public interface LuceneQuery {
      * @param mandatory whether the field is mandatory or not
      * @return this
      */
-    public LuceneQuery addUnescapedField (String key, CharSequence value, boolean mandatory);
+    LuceneQuery addUnescapedField(String key, CharSequence value, boolean mandatory);
     
     
     /**
@@ -357,7 +362,7 @@ public interface LuceneQuery {
      * @param mandatory whether the argument is mandatory or not
      * @return this
      */
-    public LuceneQuery addUnescaped (CharSequence value, boolean mandatory);
+    LuceneQuery addUnescaped(CharSequence value, boolean mandatory);
     
     
     
@@ -376,7 +381,7 @@ public interface LuceneQuery {
      * @param value the (string)-value of the field
      * @return this
      */
-    public LuceneQuery addField (String key, String value);
+    LuceneQuery addField(String key, String value);
     
     
     /**
@@ -386,11 +391,11 @@ public interface LuceneQuery {
      * @param mandatoryKey
      * @return this
      */
-    public LuceneQuery addField (String key, String value, boolean mandatoryKey);
+    LuceneQuery addField(String key, String value, boolean mandatoryKey);
     
     
     /**
-     * Append a field with a string value, and apply a boost afterwards 
+     * Append a field with a string value, and apply a boost afterwards .
      * 
      * @see LuceneQuery#addField(String, String, boolean)
      * 
@@ -400,7 +405,7 @@ public interface LuceneQuery {
      * @param boostFactor
      * @return this
      */
-    public LuceneQuery addField (String key, String value, boolean mandatoryKey, double boostFactor);
+    LuceneQuery addField(String key, String value, boolean mandatoryKey, double boostFactor);
     
     
     /**
@@ -411,7 +416,7 @@ public interface LuceneQuery {
      * @param boostFactor
      * @return this
      */
-    public LuceneQuery addField (String key, String value, QueryModifier modifier);
+    LuceneQuery addField(String key, String value, QueryModifier modifier);
     
     
     
@@ -429,11 +434,11 @@ public interface LuceneQuery {
      * @param mandatoryValue
      * @return this
      */
-    public LuceneQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue);
+    LuceneQuery addField(String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue);
     
     
     /**
-     * Append a field with a collection of values, and apply a boost afterwards 
+     * Append a field with a collection of values, and apply a boost afterwards.
      * 
      * @see LuceneQuery#addField(String, boolean, Collection, boolean)
      * 
@@ -444,7 +449,8 @@ public interface LuceneQuery {
      * @param boostFactor
      * @return this
      */
-    public LuceneQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue, double boostFactor);
+    LuceneQuery addField(String key, boolean mandatoryKey, Collection<?> value, 
+            boolean mandatoryValue, double boostFactor);
     
 
     /**
@@ -457,7 +463,7 @@ public interface LuceneQuery {
      * @param value
      * @return this
      */
-    public LuceneQuery addField (String key, Collection<?> value);
+    LuceneQuery addField(String key, Collection<?> value);
     
 
     /**
@@ -469,7 +475,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addField (String key, Collection<?> value, QueryModifier modifier);
+    LuceneQuery addField(String key, Collection<?> value, QueryModifier modifier);
 
     
     
@@ -488,10 +494,9 @@ public interface LuceneQuery {
      * @param <K>
      * @param key the name of the field
      * @param value the values to be searched in the field
-     * @param modifier the query modifier
      * @return this
      */
-    public <K> LuceneQuery addField (String key, K[] value);
+    <K> LuceneQuery addField(String key, K[] value);
     
     
     /**
@@ -504,7 +509,7 @@ public interface LuceneQuery {
      * @param modifier the query modifier
      * @return this
      */
-    public <K> LuceneQuery addField (String key, K[] value, QueryModifier modifier);
+    <K> LuceneQuery addField(String key, K[] value, QueryModifier modifier);
     
     
 
@@ -514,68 +519,72 @@ public interface LuceneQuery {
     
     
     /**
-     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
-     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
-     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
-     * <br><br>
-     * This method uses the {@link #getDefaultQueryModifier()} and {@link #defaultFuzzyness}.
+     * Append a fuzzy search argument with the given fuzzyness for the given field.
+     * <br>fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * <br>Less fuzzyness (closer to 0) means less accuracy, and vice versa
+     *   (the closer to 1, solr yields less but accurater results)
+     * <br>
+     * <br>This method uses the {@link #getDefaultQueryModifier()} and {@link #DEFAULT_FUZZYNESS}.
      * 
      * @param key the name of the field
      * @param value the value to search for
-     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
-     * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQuery addFuzzyField (String key, String value);
+    LuceneQuery addFuzzyField(String key, String value);
     
     
     /**
      * Append a fuzzy search argument with default fuzzyness (0.5) for the given field. <br>
      * fuzzy searches include arguments that are in the levenshtein distance of the searched term.
      * <br><br>
-     * This method uses the {@link #defaultFuzzyness}.
+     * This method uses the {@link #DEFAULT_FUZZYNESS}.
      * 
      * @param key the name of the field
      * @param value the value to search for
-     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
+     * @param mandatoryKey if true then the field must contain the given value, 
+     *   otherwise it is just prioritized in the search results
      * @return this
      */
-    public LuceneQuery addFuzzyField (String key, String value, boolean mandatoryKey);
+    LuceneQuery addFuzzyField(String key, String value, boolean mandatoryKey);
     
     
     /**
-     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
-     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
-     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
+     * Append a fuzzy search argument with the given fuzzyness for the given field.
+     * <br>fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * <br>Less fuzzyness (closer to 0) means less accuracy, and vice versa
+     *   (the closer to 1, solr yields less but accurater results)
      * 
      * @param key the name of the field
      * @param value the value to search for
-     * @param mandatoryKey if true then the field must contain the given value, otherwise it is just prioritized in the search results
+     * @param mandatoryKey if true then the field must contain the given value,
+     *   otherwise it is just prioritized in the search results
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQuery addFuzzyField (String key, String value, boolean mandatoryKey, double fuzzyness);
+    LuceneQuery addFuzzyField(String key, String value, boolean mandatoryKey, double fuzzyness);
     
     
     /**
-     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
-     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
-     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
-     * <br><br>
-     * This method uses the {@link #defaultFuzzyness}.
+     * Append a fuzzy search argument with the given fuzzyness for the given field.
+     * <br>fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * <br>Less fuzzyness (closer to 0) means less accuracy, and vice versa
+     *   (the closer to 1, solr yields less but accurater results)
+     * <br>
+     * <br>This method uses the {@link #DEFAULT_FUZZYNESS}.
      * 
      * @param key the name of the field
      * @param value the value to search for
      * @param mod the modifiers to use
      * @return this
      */
-    public LuceneQuery addFuzzyField (String key, String value, QueryModifier mod);
+    LuceneQuery addFuzzyField(String key, String value, QueryModifier mod);
     
     
     /**
-     * Append a fuzzy search argument with the given fuzzyness for the given field. <br>
-     * fuzzy searches include arguments that are in the levenshtein distance of the searched term. <br>
-     * Less fuzzyness (closer to 0) means less accuracy, and vice versa (the closer to 1, solr yields less but accurater results)
+     * Append a fuzzy search argument with the given fuzzyness for the given field.
+     * <br>fuzzy searches include arguments that are in the levenshtein distance of the searched term.
+     * <br>Less fuzzyness (closer to 0) means less accuracy, and vice versa
+     *   (the closer to 1, solr yields less but accurater results)
      * 
      * @param key the name of the field
      * @param value the value to search for
@@ -583,7 +592,7 @@ public interface LuceneQuery {
      * @param fuzzyness the fuzzyness; must be between 0 and 1, so that 0 <= fuzzyness < 1
      * @return this
      */
-    public LuceneQuery addFuzzyField (String key, String value, QueryModifier mod, double fuzzyness);
+    LuceneQuery addFuzzyField(String key, String value, QueryModifier mod, double fuzzyness);
 
     
 
@@ -608,7 +617,7 @@ public interface LuceneQuery {
      * @param value the collection of values for the field
      * @return this
      */
-    public LuceneQuery addFieldAsCollection (String key, Collection<?> value);
+    LuceneQuery addFieldAsCollection(String key, Collection<?> value);
     
     
     /**
@@ -620,11 +629,11 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier);
+    LuceneQuery addFieldAsCollection(String key, Collection<?> value, QueryModifier modifier);
     
     
     /**
-     * Append a field with a collection of values, and apply a boost afterwards 
+     * Append a field with a collection of values, and apply a boost afterwards .
      * 
      * @see LuceneQuery#addFieldAsCollection(String, Collection, QueryModifier)
      * 
@@ -634,7 +643,7 @@ public interface LuceneQuery {
      * @param boost
      * @return this
      */
-    public LuceneQuery addFieldAsCollection (String key, Collection<?> value, QueryModifier modifier, double boost);
+    LuceneQuery addFieldAsCollection(String key, Collection<?> value, QueryModifier modifier, double boost);
     
     
     /**
@@ -646,7 +655,7 @@ public interface LuceneQuery {
      * @param value
      * @return this
      */
-    public <K> LuceneQuery addFieldAsArray (String key, K[] value);
+    <K> LuceneQuery addFieldAsArray(String key, K[] value);
     
     
     /**
@@ -659,7 +668,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public <K> LuceneQuery addFieldAsArray (String key, K[] value, QueryModifier modifier);
+    <K> LuceneQuery addFieldAsArray(String key, K[] value, QueryModifier modifier);
     
     
     /**
@@ -671,7 +680,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addFieldAsArray (String key, Object value);
+    LuceneQuery addFieldAsArray(String key, Object value);
     
     
     /**
@@ -683,7 +692,7 @@ public interface LuceneQuery {
      * @param modifier
      * @return this
      */
-    public LuceneQuery addFieldAsArray (String key, Object value, QueryModifier modifier);
+    LuceneQuery addFieldAsArray(String key, Object value, QueryModifier modifier);
     
     
     
@@ -701,7 +710,7 @@ public interface LuceneQuery {
      * @param mandatory whether the field is mandatory for execution ("+" is prepended) or not.
      * @return this
      */
-    public LuceneQuery startField (String fieldName, boolean mandatory);
+    LuceneQuery startField(String fieldName, boolean mandatory);
     
     
     /**
@@ -713,7 +722,7 @@ public interface LuceneQuery {
      * @param modifier the modifiers for the field (see QueryModifier for more details)
      * @return this
      */
-    public LuceneQuery startField (String fieldName, QueryModifier modifier);
+    LuceneQuery startField(String fieldName, QueryModifier modifier);
     
     
     /**
@@ -723,7 +732,7 @@ public interface LuceneQuery {
      * or otherwise you get Solr-Exceptions on execution.
      * @return this
      */
-    public LuceneQuery endField ();
+    LuceneQuery endField();
     
     
     /**
@@ -733,7 +742,7 @@ public interface LuceneQuery {
      * @param boostFactor a positive double < 10.000.000 which boosts the previously added element
      * @return this
      */
-    public LuceneQuery addBoost (double boostFactor);
+    LuceneQuery addBoost(double boostFactor);
     
 
 }

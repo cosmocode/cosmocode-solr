@@ -1,5 +1,12 @@
 package de.cosmocode.lucene;
 
+/**
+ * The TermModifier enum is an enum over the possible modifiers that can be prepended
+ *   before a term.  
+ * <br>The TermModifier can only be used in conjunction with {@link QueryModifier}.
+ * 
+ * @author olorenz
+ */
 public enum TermModifier {
     
     /**
@@ -34,9 +41,7 @@ public enum TermModifier {
      * The implementation should prepend a "-" to the Term/Field,
      * or use {@link TermModifier#getModifier()}.
      */
-    PROHIBITED("-"),
-    
-    ;
+    PROHIBITED("-");
     
     
     private final String modifier;
@@ -47,7 +52,8 @@ public enum TermModifier {
     
     
     /**
-     * @return the modifier that should be prepended in front of the term/field to yield the desired result.
+     * Returns the modifier that should be prepended in front of the term/field to yield the desired result.
+     * @return the modifier that should be prepended in front of the term/field to yield the desired result
      */
     public String getModifier() {
         return modifier;

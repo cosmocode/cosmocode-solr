@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import de.cosmocode.lucene.AbstractLuceneQuery;
+import de.cosmocode.lucene.LuceneHelper;
 import de.cosmocode.lucene.LuceneQuery;
 import de.cosmocode.lucene.QueryModifier;
 
@@ -32,16 +32,27 @@ import de.cosmocode.lucene.QueryModifier;
  */
 class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
+    private static final Logger LOG = Logger.getLogger(DefaultSolrQuery.class);
+    
+    private static final String ERR_START_INVALID = 
+        "start must be a non-negative integer (i.e. start >= 0)";
+    private static final String ERR_MAX_INVALID = 
+        "max must be a non-negative integer, that is less than " + MAX +
+        " (i.e. 0 <= max <= " + MAX + ")";
+    private static final String ERR_NO_DTYPE = "SolrQuery needs a dtype";
+    private static final String ERR_FUZZY_OUT_OF_BOUNDS = 
+        "fuzzyness must be greater than equals 0 and less than 1 (i.e. 0 <= fuzzyness < 1)";
+    private static final String ERR_DIRECT_ASSIGN_Q = 
+        "the Request argument q cannot be directly assigned, use the addArgument-methods";
+    private static final String ERR_DIRECT_ASSIGN_START = 
+        "the Request argument start cannot be directly assigned, use setStart(int)";
+    private static final String ERR_DIRECT_ASSIGN_ROWS = 
+        "the Request argument rows cannot be directly assigned, use setRows(int)";
+    
+    
     private final Map<String, Object> requestArguments = new HashMap<String, Object>();
     
     private final StringBuilder queryArguments;
-    
-    private static final Logger logger = Logger.getLogger(DefaultSolrQuery.class);
-    
-    private static final String ERR_START_INVALID = "start must be a non-negative integer (i.e. start >= 0)";
-    private static final String ERR_MAX_INVALID = "max must be a non-negative integer, that is less than " + MAX 
-                                                    + " (i.e. 0 <= max <= " + MAX + ")";
-    private static final String ERR_NO_DTYPE = "SolrQuery needs a dtype";
     
     
     /**
@@ -56,7 +67,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
      * @param wildcarded {@link LuceneQuery#setWildCarded(boolean)} is called with the given value
      * @throws IllegalArgumentException, if start or max is not valid
      */
-    public DefaultSolrQuery (final int start, final int max, final boolean wildCarded) {
+    public DefaultSolrQuery(final int start, final int max, final boolean wildCarded) {
         if (start < 0) throw new IllegalArgumentException(ERR_START_INVALID);
         if (max < 0 || max > SolrQuery.MAX) throw new IllegalArgumentException(ERR_MAX_INVALID);
 
@@ -81,7 +92,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
      * @param wildcarded {@link LuceneQuery#setWildCarded(boolean)} is called with the given value
      * @throws IllegalArgumentException, if start or max is not valid
      */
-    public DefaultSolrQuery (final String dtype, final int start, final int max, final boolean wildCarded) {
+    public DefaultSolrQuery(final String dtype, final int start, final int max, final boolean wildCarded) {
         this(start, max, wildCarded);
         
         if (StringUtils.isNotBlank(dtype)) {
@@ -95,7 +106,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     @Override
     public String getSelectFields() {
         if (requestArguments.containsKey("fl")) {
-            Object fl = requestArguments.get("fl");
+            final Object fl = requestArguments.get("fl");
             if (fl != null) return fl.toString();
         }
         return "*";
@@ -111,7 +122,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     @Override
     public String getSortFields() {
         if (requestArguments.containsKey("sort")) {
-            Object fl = requestArguments.get("sort");
+            final Object fl = requestArguments.get("sort");
             if (fl != null) return fl.toString();
         }
         return null;
@@ -138,7 +149,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public int getRows() {
-        return (Integer)requestArguments.get("rows");
+        return (Integer) requestArguments.get("rows");
     }
 
     
@@ -151,29 +162,29 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public int getStart() {
-        return (Integer)requestArguments.get("start");
+        return (Integer) requestArguments.get("start");
     }
 
     
     @Override
     public void setStart(final int start) {
-        if (start < 0) throw new IllegalArgumentException ("start must be a non-negative integer");
+        if (start < 0) throw new IllegalArgumentException("start must be a non-negative integer");
         requestArguments.put("start", start);
     }
     
     
     @Override
     public void setRequestArgument(final String name, final String value) {
-        if ("q".equalsIgnoreCase(name)) throw new IllegalArgumentException("the Request argument q cannot be directly assigned, use the addArgument-methods");
-        if ("start".equalsIgnoreCase(name)) throw new IllegalArgumentException("the Request argument start cannot be directly assigned, use setStart(int)");
-        if ("rows".equalsIgnoreCase(name)) throw new IllegalArgumentException("the Request argument rows cannot be directly assigned, use setRows(int)");
+        if ("q".equalsIgnoreCase(name)) throw new IllegalArgumentException(ERR_DIRECT_ASSIGN_Q);
+        if ("start".equalsIgnoreCase(name)) throw new IllegalArgumentException(ERR_DIRECT_ASSIGN_START);
+        if ("rows".equalsIgnoreCase(name)) throw new IllegalArgumentException(ERR_DIRECT_ASSIGN_ROWS);
         requestArguments.put(name, value);
     }
     
     
     @Override
     @SuppressWarnings("unchecked")
-    public void addFacetField (final String facetFieldName) {
+    public void addFacetField(final String facetFieldName) {
         if (facetFieldName != null) {
             Set<String> facetFields = new HashSet<String>();
             if (!requestArguments.containsKey("facet.field")) {
@@ -182,8 +193,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
                 requestArguments.put("facet", true);
             } else {
                 try {
-                    facetFields = (Set<String>)requestArguments.get("facet.field");
-                } catch (ClassCastException e) { logger.warn("Cannot get facet.field", e); }
+                    facetFields = (Set<String>) requestArguments.get("facet.field");
+                } catch (ClassCastException e) { LOG.warn("Cannot get facet.field", e); }
             }
             facetFields.add(facetFieldName);
         }
@@ -191,7 +202,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public void addFacetFields (final String... facetFields) {
+    public void addFacetFields(final String... facetFields) {
         if (facetFields == null) return;
         
         for (final String facetField : facetFields) {
@@ -207,6 +218,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     /**
+     * Returns the request arguments in a new HashMap.
      * @param logRequestArgs if true, then SolrQuery logs the returned map in log4j. Otherwise not.
      * @return the request arguments in a new HashMap 
      * (no modifications on this SolrQuery possible)
@@ -215,7 +227,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
      // put requests into a separate map to prevent modification and to add the query
         final Map<String, Object> requestArgs = new HashMap<String, Object>(this.requestArguments);
         requestArgs.put("q", this.queryArguments);
-        if (logRequestArgs && logger.isDebugEnabled()) logger.debug(requestArgs.toString());
+        if (logRequestArgs && LOG.isDebugEnabled()) LOG.debug(requestArgs.toString());
         return requestArgs;
     }
     
@@ -239,18 +251,19 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addFuzzyArgument (final String value, final QueryModifier modifier, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyArgument(final String value, 
+            final QueryModifier modifier, final double fuzzyness) {
         if (fuzzyness < 0.0 || fuzzyness >= 1.0)
-            throw new IllegalArgumentException("fuzzyness must be greater than equals 0 and less than 1 (i.e. 0 <= fuzzyness < 1)");
+            throw new IllegalArgumentException(ERR_FUZZY_OUT_OF_BOUNDS);
         
         // TODO: implement isSplit() of QueryModifier
         if (StringUtils.isNotBlank(value) && modifier != null) {
             queryArguments.append(modifier.getTermPrefix());
             
-            queryArguments.append("(")
-                .append(escapeQuotes(escapeInput(value, true)))
-                .append("~").append(fuzzyness)
-            .append(") ");
+            queryArguments.append("(").
+                append(LuceneHelper.escapeAll(value)).
+                append("~").append(fuzzyness);
+            queryArguments.append(")");
         }
         
         return this;
@@ -258,7 +271,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addArgument (final String value, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgument(final String value, final QueryModifier modifier) {
         // TODO: implement isSplit() of QueryModifier
         if (StringUtils.isNotBlank(value) && modifier != null) {
             queryArguments.append(modifier.getTermPrefix());
@@ -266,12 +279,12 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
             if (modifier.isWildcarded()) {
                 // search for input wildcarded (wildcard is appended at the end). 
                 // the original input is added, too, because e.g. adidas* doesn't match "adidas" on text-fields
-                queryArguments.append("(")
-                    .append("\"").append(escapeQuotes(value)).append("\"^2")
-                    .append(" ").append(escapeQuotes(escapeInput(value, true))).append("*")
-                .append(")");
+                queryArguments.append("(").
+                    append("\"").append(LuceneHelper.escapeQuotes(value)).append("\"^2").
+                    append(" ").append(LuceneHelper.escapeAll(value)).append("*");
+                queryArguments.append(")");
             } else {
-                queryArguments.append(escapeQuotes(escapeInput(value, true)));
+                queryArguments.append(LuceneHelper.escapeAll(value));
             }
             queryArguments.append(" ");
         }
@@ -284,7 +297,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addArgumentAsCollection (final Collection<?> values, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgumentAsCollection(final Collection<?> values, final QueryModifier modifier) {
         if (values != null && values.size() > 0) {
             // start
             queryArguments.append("(");
@@ -309,7 +322,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public <K> DefaultSolrQuery addArgumentAsArray (final K[] values, final QueryModifier modifier) {
+    public <K> DefaultSolrQuery addArgumentAsArray(final K[] values, final QueryModifier modifier) {
         if (values != null && values.length > 0) {
             // start
             queryArguments.append("(");
@@ -334,7 +347,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addArgumentAsArray (Object values, final QueryModifier modifier) {
+    public DefaultSolrQuery addArgumentAsArray(Object values, final QueryModifier modifier) {
         if (values != null && values.getClass().isArray() && Array.getLength(values) > 0) {
             final int arrayLength = Array.getLength(values);
             
@@ -362,7 +375,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addSubquery (final LuceneQuery value, final boolean mandatory) {
+    public DefaultSolrQuery addSubquery(final LuceneQuery value, final boolean mandatory) {
         if (value != null) {
             if (mandatory) queryArguments.append("+");
             queryArguments.append("(").append(value.getQuery()).append(") ");
@@ -373,7 +386,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addSubquery (final LuceneQuery value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addSubquery(final LuceneQuery value, final QueryModifier modifiers) {
         if (value != null) {
             queryArguments.append(modifiers.getTermPrefix());
             queryArguments.append("(").append(value.getQuery()).append(") ");
@@ -390,7 +403,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addUnescapedField (final String key, final CharSequence value, final boolean mandatory) {
+    public DefaultSolrQuery addUnescapedField(final String key, final CharSequence value, final boolean mandatory) {
         if (key == null || value == null) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -401,7 +414,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addUnescaped (final CharSequence value, final boolean mandatory) {
+    public DefaultSolrQuery addUnescaped(final CharSequence value, final boolean mandatory) {
         if (value == null) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -438,7 +451,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addField (final String key, final String value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addField(final String key, final String value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
             this.startField(key, modifiers);
             this.addArgument(value, modifiers);
@@ -457,7 +470,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addFuzzyField (final String key, final String value, final boolean mandatoryKey, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyField(final String key, final String value, 
+            final boolean mandatoryKey, final double fuzzyness) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
             this.startField(key, mandatoryKey);
             this.addFuzzyArgument(value, false, fuzzyness);
@@ -476,7 +490,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addFuzzyField (final String key, final String value, final QueryModifier modifier, final double fuzzyness) {
+    public DefaultSolrQuery addFuzzyField(final String key, final String value, 
+            final QueryModifier modifier, final double fuzzyness) {
         if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
             this.startField(key, modifier);
             this.addFuzzyArgument(value, false, fuzzyness);
@@ -495,7 +510,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addField (String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue) {
+    public DefaultSolrQuery addField(String key, boolean mandatoryKey, Collection<?> value, boolean mandatoryValue) {
         if (StringUtils.isNotBlank(key) && value != null && value.size() > 0) {
             startField(key, mandatoryKey);
             addArgument(value, mandatoryValue);
@@ -507,7 +522,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
 
     
     @Override
-    public DefaultSolrQuery addFieldAsCollection (final String key, final Collection<?> value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addFieldAsCollection(final String key, 
+            final Collection<?> value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.size() > 0) {
             startField(key, modifiers);
             addArgumentAsCollection(value, modifiers);
@@ -519,7 +535,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public <K> DefaultSolrQuery addFieldAsArray (final String key, final K[] value, final QueryModifier modifiers) {
+    public <K> DefaultSolrQuery addFieldAsArray(final String key, final K[] value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.length > 0) {
             startField(key, modifiers);
             addArgumentAsArray(value, modifiers);
@@ -531,7 +547,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addFieldAsArray (final String key, final Object value, final QueryModifier modifiers) {
+    public DefaultSolrQuery addFieldAsArray(final String key, final Object value, final QueryModifier modifiers) {
         if (StringUtils.isNotBlank(key) && value != null && value.getClass().isArray() && Array.getLength(value) > 0) {
             startField(key, modifiers);
             addArgumentAsArray(value, modifiers);
@@ -547,7 +563,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     //---------------------------
     
     @Override
-    public DefaultSolrQuery startField (final String fieldName, final boolean mandatory) {
+    public DefaultSolrQuery startField(final String fieldName, final boolean mandatory) {
         if (StringUtils.isBlank(fieldName)) return this;
         
         if (mandatory) queryArguments.append("+");
@@ -558,7 +574,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery startField (final String fieldName, final QueryModifier modifier) {
+    public DefaultSolrQuery startField(final String fieldName, final QueryModifier modifier) {
         if (StringUtils.isBlank(fieldName)) return this;
         
         queryArguments.append(modifier.getTermPrefix());
@@ -569,8 +585,8 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery endField () {
-        if (queryArguments.charAt(queryArguments.length()-1) == '(') {
+    public DefaultSolrQuery endField() {
+        if (queryArguments.charAt(queryArguments.length() - 1) == '(') {
             // add an empty string, if the field was ended right after it was started
             queryArguments.append("\"\"");
         }
@@ -581,12 +597,13 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
-    public DefaultSolrQuery addBoost (final double boostFactor) {
+    public DefaultSolrQuery addBoost(final double boostFactor) {
         if (boostFactor <= 0.0 || boostFactor >= 10000000.0)
             throw new IllegalArgumentException("boostFactor must be greater than 0 and less than 10.000.000 (10 Mio.)");
         
-        if (boostFactor != 1.0) { // optimization: only add boost factor if != 1
-            final double rounded = ((int)(boostFactor * 100.0)) / 100.0;
+        // optimization: only add boost factor if != 1
+        if (boostFactor != 1.0) {
+            final double rounded = ((int) (boostFactor * 100.0)) / 100.0;
             this.queryArguments.append("^").append(rounded).append(" ");
         }
 
@@ -597,66 +614,6 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     @Override
     public String toString() {
         return getRequestArguments(false).toString();
-    }
-
-    
-    //---------------------------
-    //   public helper methods
-    //---------------------------
-    
-    // escape +,\,&,|,!,(,),{,},[,],^,~,?,*,: and blanks  with "\"
-    public static final Pattern escapePattern         = Pattern.compile("[\\Q+\\&|!(){}[]^~?*:; \\E]");
-    // escape +,\,&,|,!,(,),{,},[,],^,~,?,*,: with "\"
-    public static final Pattern escapeNoBlanksPattern = Pattern.compile("[\\Q+\\&|!(){}[]^~?*:;\\E]");
-    // remove -
-    public static final Pattern removePattern         = Pattern.compile("[\\-]");
-    // remove - and blanks
-    public static final Pattern removeBlanksPattern   = Pattern.compile("[\\- ]");
-    
-    public static final Pattern quotesPattern         = Pattern.compile("[\"]");
-    
-    
-    /**
-     * Escapes quotes (") in a given input (" => \")
-     * @param input
-     * @return
-     */
-    public static String escapeQuotes (final String input) {
-        if (input == null) return "";
-        return quotesPattern.matcher(input).replaceAll("\\\\$0");
-    }
-    
-    
-    /**
-     * Removes quotes (") from a given input
-     * @param input
-     * @return
-     */
-    public static String removeQuotes (final String input) {
-        if (input == null) return "";
-        return quotesPattern.matcher(input).replaceAll("");
-    }
-    
-    
-    /**
-     * Escapes special chars for solr.<br>
-     * Special chars are: +,\,&,|,!,(,),{,},[,],^,~,?,*,:.<br>
-     * If `escapeBlanks` is true, then blanks are escaped, otherwise they are removed
-     * They are escaped with "\".<br>
-     * <br>
-     * This function was taken (with heavy modifications) from
-     * http://www.javalobby.org/java/forums/t86124.html
-     * @param input the input to escape
-     * @return the input, escaped for solr
-     */
-    public static String escapeInput (final String input, final boolean escapeBlanks) {
-        if (input == null) return "";
-        return 
-        (escapeBlanks ? escapePattern : escapeNoBlanksPattern).matcher(
-            (escapeBlanks ? removePattern : removeBlanksPattern).matcher(
-                input
-            ).replaceAll("")
-        ).replaceAll("\\\\$0");
     }
     
 

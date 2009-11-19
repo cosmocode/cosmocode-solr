@@ -21,6 +21,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>de.cosmocode</groupId>
+      <artifactId>log4j-config</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
     	<groupId>commons-lang</groupId>
     	<artifactId>commons-lang</artifactId>
     </dependency>

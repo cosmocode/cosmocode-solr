@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.cosmocode.lucene.AbstractLuceneQuery;
 import de.cosmocode.lucene.LuceneHelper;
@@ -27,14 +28,14 @@ import de.cosmocode.lucene.QueryModifier;
  * 
  * @see SolrQueryFactory
  * 
+ * TODO Oliver Lorenz
  * @author olorenz
  *
  */
+// TODO class should be final
 class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
-    // TODO get rid of log4j, use slf4j instead
-    // TODO LOG should be log
-    private static final Logger LOG = Logger.getLogger(DefaultSolrQuery.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultSolrQuery.class);
     
     private static final String ERR_START_INVALID = 
         "start must be a non-negative integer (i.e. start >= 0)";
@@ -104,14 +105,10 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
         }
     }
 
-    
     @Override
     public String getSelectFields() {
-        if (requestArguments.containsKey("fl")) {
-            final Object fl = requestArguments.get("fl");
-            if (fl != null) return fl.toString();
-        }
-        return "*";
+        final Object field = requestArguments.get("fl");
+        return field == null ? "*" : field.toString();
     }
     
     
@@ -120,14 +117,10 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
         requestArguments.put("fl", StringUtils.join(fields, ","));
     }
 
-    
     @Override
     public String getSortFields() {
-        if (requestArguments.containsKey("sort")) {
-            final Object fl = requestArguments.get("sort");
-            if (fl != null) return fl.toString();
-        }
-        return null;
+        final Object field = requestArguments.get("sort");
+        return field == null ? null : field.toString();
     }
 
     
@@ -145,10 +138,11 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public void setMax(final int max) {
+        // TODO max negative?
         setRows(max);
     }
 
-    
+    // TODO i smell a NullPointerException here
     @Override
     public int getRows() {
         return (Integer) requestArguments.get("rows");
@@ -157,11 +151,13 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public void setRows(final int rows) {
+        // TODO throw IllegalArgumentException instead
         final int absMax = (rows < 0) ? Math.abs(rows) : rows;
         requestArguments.put("rows", absMax);
     }
 
-    
+
+    // TODO i smell a NullPointerException here
     @Override
     public int getStart() {
         return (Integer) requestArguments.get("start");
@@ -170,6 +166,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public void setStart(final int start) {
+        // TODO take a look at Preconditions (google)
         if (start < 0) throw new IllegalArgumentException("start must be a non-negative integer");
         requestArguments.put("start", start);
     }
@@ -185,26 +182,32 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     
     @Override
+    // TODO don't use suppress on the whole method
     @SuppressWarnings("unchecked")
     public void addFacetField(final String facetFieldName) {
-        if (facetFieldName != null) {
-            Set<String> facetFields = new HashSet<String>();
-            if (!requestArguments.containsKey("facet.field")) {
-                facetFields = new HashSet<String>();
-                requestArguments.put("facet.field", facetFields);
-                requestArguments.put("facet", true);
-            } else {
-                try {
-                    facetFields = (Set<String>) requestArguments.get("facet.field");
-                } catch (ClassCastException e) { LOG.warn("Cannot get facet.field", e); }
+        if (facetFieldName == null) return;
+        final Set<String> facetFields;
+        if (requestArguments.containsKey("facet.field")) {
+            try {
+                facetFields = (Set<String>) requestArguments.get("facet.field");
+            } catch (ClassCastException e) {
+                log.warn("Cannot get facet.field", e);
+                // TODO instanceof check would save us an exception 
+                // TODO fail here ?!
+                return;
             }
-            facetFields.add(facetFieldName);
+        } else {
+            facetFields = new HashSet<String>();
+            requestArguments.put("facet.field", facetFields);
+            requestArguments.put("facet", true);
         }
+        facetFields.add(facetFieldName);
     }
     
     
     @Override
     public void addFacetFields(final String... facetFields) {
+        // TODO null should not be omitted, throw NullPointerException
         if (facetFields == null) return;
         
         for (final String facetField : facetFields) {
@@ -221,15 +224,17 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     /**
      * Returns the request arguments in a new HashMap.
+     * TODO logging decisions should be left to the configuration, not the application
      * @param logRequestArgs if true, then SolrQuery logs the returned map in log4j. Otherwise not.
      * @return the request arguments in a new HashMap 
      * (no modifications on this SolrQuery possible)
      */
     protected Map<String, Object> getRequestArguments(final boolean logRequestArgs) {
      // put requests into a separate map to prevent modification and to add the query
+        // TODO what about Collections.unmodifiableMap(Map), can be cached
         final Map<String, Object> requestArgs = new HashMap<String, Object>(this.requestArguments);
         requestArgs.put("q", this.queryArguments);
-        if (logRequestArgs && LOG.isDebugEnabled()) LOG.debug(requestArgs.toString());
+        if (logRequestArgs && log.isDebugEnabled()) log.debug(requestArgs.toString());
         return requestArgs;
     }
     
@@ -246,7 +251,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     }
     
     
-    
+    // TODO stick to javadoc style comments
     //---------------------------
     //     addArgument-methods
     //---------------------------
@@ -305,6 +310,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
             queryArguments.append("(");
 
             // add items
+            // TODO what about leaving this decision to the QueryModifier class
             final QueryModifier valueModifier = modifier.isDisjunct() ? QueryModifier.NONE : QueryModifier.REQUIRED;
             for (Object val : values) {
                 addArgument(val, valueModifier);
@@ -325,6 +331,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public <K> DefaultSolrQuery addArgumentAsArray(final K[] values, final QueryModifier modifier) {
+        // TODO quick return if values == null || values.length == 0
         if (values != null && values.length > 0) {
             // start
             queryArguments.append("(");
@@ -347,9 +354,10 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
         return this;
     }
     
-    
+    // TODO clients should care about Objects, we should require typed arrays
     @Override
     public DefaultSolrQuery addArgumentAsArray(Object values, final QueryModifier modifier) {
+        // TODO if (values == null) return this;
         if (values != null && values.getClass().isArray() && Array.getLength(values) > 0) {
             final int arrayLength = Array.getLength(values);
             

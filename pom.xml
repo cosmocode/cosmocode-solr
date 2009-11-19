@@ -30,10 +30,6 @@
     	<artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-    	<groupId>log4j</groupId>
-    	<artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>de.cosmocode</groupId>
     	<artifactId>cosmocode-patterns</artifactId>
     </dependency>

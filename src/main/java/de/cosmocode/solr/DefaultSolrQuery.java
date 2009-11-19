@@ -32,6 +32,8 @@ import de.cosmocode.lucene.QueryModifier;
  */
 class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
+    // TODO get rid of log4j, use slf4j instead
+    // TODO LOG should be log
     private static final Logger LOG = Logger.getLogger(DefaultSolrQuery.class);
     
     private static final String ERR_START_INVALID = 

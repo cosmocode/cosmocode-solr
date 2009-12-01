@@ -675,9 +675,8 @@ public interface LuceneQuery {
      * Add a field with the name `key` to the query.
      * The values to search for are given in an array.
      * 
-     * @param key
-     * @param value
-     * @param modifier
+     * @param key the name of the field
+     * @param value the values to add
      * @return this
      */
     LuceneQuery addFieldAsArray(String key, Object value);
@@ -688,8 +687,8 @@ public interface LuceneQuery {
      * The values to search for are given in an array.
      * 
      * @param key the name of the field
-     * @param value
-     * @param modifier
+     * @param value the values to add
+     * @param modifier the QueryModifier to apply
      * @return this
      */
     LuceneQuery addFieldAsArray(String key, Object value, QueryModifier modifier);

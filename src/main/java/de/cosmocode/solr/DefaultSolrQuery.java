@@ -310,8 +310,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
             queryArguments.append("(");
 
             // add items
-            // TODO what about leaving this decision to the QueryModifier class
-            final QueryModifier valueModifier = modifier.isDisjunct() ? QueryModifier.NONE : QueryModifier.REQUIRED;
+            final QueryModifier valueModifier = modifier.getFieldValueModifier();
             for (Object val : values) {
                 addArgument(val, valueModifier);
             }
@@ -337,7 +336,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
             queryArguments.append("(");
             
             // add items
-            final QueryModifier valueModifier = modifier.isDisjunct() ? QueryModifier.NONE : QueryModifier.REQUIRED;
+            final QueryModifier valueModifier = modifier.getFieldValueModifier();
             for (K val : values) {
                 addArgument(val, valueModifier);
             }
@@ -365,7 +364,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
             queryArguments.append("(");
             
             // add all items
-            final QueryModifier valueModifier = modifier.isDisjunct() ? QueryModifier.NONE : QueryModifier.REQUIRED;
+            final QueryModifier valueModifier = modifier.getFieldValueModifier();
             for (int i = 0; i < arrayLength; i++) {
                 addArgument(Array.get(values, i), valueModifier);
             }

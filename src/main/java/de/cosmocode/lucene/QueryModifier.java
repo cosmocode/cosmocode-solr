@@ -14,111 +14,49 @@ import de.cosmocode.solr.SolrQueryFactory;
  */
 @Immutable
 public final class QueryModifier {
-    
-    
-    // TODO: redesign with Builder pattern
-    
-    
-    /**
-     * This is a static shortcut to: <code>new QueryModifier(TermModifier.REQUIRED)</code>.
-     */
-    public static final QueryModifier REQUIRED = new QueryModifier(TermModifier.REQUIRED);
-    
-    /**
-     * This is a static shortcut to: <code>new QueryModifier(TermModifier.PROHIBITED)</code>.
-     */
-    public static final QueryModifier PROHIBITED = new QueryModifier(TermModifier.PROHIBITED);
-    
-    /**
-     * This is a static shortcut to: <code>new QueryModifier(TermModifier.NONE)</code>.
-     */
-    public static final QueryModifier NONE = new QueryModifier(TermModifier.NONE);
-    
-    private final TermModifier termModifier;
-    
-    private final boolean disjunct;
-    
-    private final boolean wildcarded;
-    
-    private final boolean split;
-    
-    
-    /**
-     * Default constructor.
-     * Sets the modifier to NONE, and wildcarded, split and disjunct to false. 
-     * 
-     * 
-     * A call to {@link LuceneQuery#addField(String, Object[], QueryModifier)} would look like this:<br>
-     * <pre>
-     * final QueryModifier mod = new QueryModifier();
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#createSolrQuery()};
-     * query.addField("test", new String[] {"test1", "test2"}, mod);
-     * query.toString(); // test:(test1 test2)
-     * </pre>
-     * 
-     * 
-     * And a call to addTerm would look like this:<br>
-     * <pre>
-     * final QueryModifier mod = new QueryModifier();
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#createSolrQuery()};
-     * query.addArgument("test", mod);
-     * query.toString(); // test
-     * </pre>
-     * 
-     */
-    public QueryModifier() {
-        this.termModifier = TermModifier.NONE;
-        this.disjunct = false;
-        this.wildcarded = false;
-        this.split = false;
-    }
-    
-    
-    /**
-     * This constructor sets modifier to the given modifier
-     * and wildcarded, split and disjunct to false.
-     * 
-     * 
-     * A call to addField would for example look like this:<br>
-     * <pre>
-     * final QueryModifier mod = new QueryModifier({@link TermModifier#REQUIRED});
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#createSolrQuery()};
-     * query.addField("test", new String[] {"test1", "test2"}, mod);
-     * query.toString(); // +test:(test1 test2)
-     * </pre>
-     * 
-     * 
-     * And a call to addTerm would look like this:<br>
-     * <pre>
-     * final QueryModifier mod = new QueryModifier({@link TermModifier#REQUIRED});
-     * final {@link SolrQuery} query = {@link SolrQueryFactory#createSolrQuery()};
-     * query.addArgument("test", mod);
-     * query.toString(); // +test
-     * </pre>
-     * 
-     * 
-     * @param termModifier the term modifier
-     */
-    public QueryModifier(final TermModifier termModifier) {
-        // TODO: null checks
-        this (termModifier, false, false, false);
-    }
-    
+	
+	public static final String ERR_TERMMOD_NULL = 
+		"the given TermModifier must not be null";
+	
+	public static final String ERR_FUZZYNESS_INVALID = 
+		"the given fuzzyness must be between 0 (inclusive) and 1 (exclusive)";
+	
+	public static final String ERR_FUZZYNESS_DISABLED = 
+		"fuzzyness is not enabled";
+	
+	/**
+	 * The default QueryModifier.
+	 * It has termModifier set to NONE,
+	 * split, disjunct and wildcarded are false
+	 * and fuzzyness is disabled.
+	 */
+	public static final QueryModifier DEFAULT = start().end();
+	
+	
+	private final TermModifier termModifier;
+	private final boolean split;
+	private final boolean disjunct;
+	private final boolean wildcarded;
+	private final Double fuzzyness;
 
-    /**
-     * This constructor sets all values to their explicitly given values.
-     * @param termModifier the term modifier
-     */
-    public QueryModifier(final TermModifier termModifier, final boolean disjunct,
-            final boolean wildcarded, final boolean split) {
-        // TODO: null checks
-        this.termModifier = termModifier;
-        this.disjunct = disjunct;
-        this.wildcarded = wildcarded;
-        this.split = split;
-    }
-    
-    
+	
+	public QueryModifier(TermModifier termModifier, boolean split,
+			boolean disjunct, boolean wildcarded, Double fuzzyness) {
+		super();
+		
+		if (termModifier == null) throw new NullPointerException(ERR_TERMMOD_NULL);
+		if (fuzzyness != null) {
+			if (fuzzyness < 0 || fuzzyness >= 1) throw new IllegalArgumentException(ERR_FUZZYNESS_INVALID);
+		}
+		
+		this.termModifier = termModifier;
+		this.split = split;
+		this.disjunct = disjunct;
+		this.wildcarded = wildcarded;
+		this.fuzzyness = fuzzyness;
+	}
+	
+	
     /**
      * This method returns the term prefix.
      * The term prefix is written in front of the term or field
@@ -130,53 +68,161 @@ public final class QueryModifier {
     public String getTermPrefix() {
         return termModifier.getModifier();
     }
-    
-    
-    public TermModifier getTermModifier() {
-        return termModifier;
-    }
-    
-    
-    public boolean isDisjunct() {
-        return disjunct;
-    }
-    
-    
-    public boolean isWildcarded() {
-        return wildcarded;
-    }
-    
-    
-    public boolean isSplit() {
-        return split;
-    }
-    
-    
-    /**
-     * Returns a new QueryModifier which is a copy of `mod`
-     * with the exception of the termModifier, which is set to `tm`.
-     * @param mod the original QueryModifier to merge
-     * @param tm the new TermModifier for the new QueryModifier
-     * @return a new QueryModifier which is a merged version of `mod` and `tm`
-     */
-    public static QueryModifier merge(final QueryModifier mod, final TermModifier tm) {
-        return new QueryModifier(tm, mod.isDisjunct(), mod.isWildcarded(), mod.isSplit());
-    }
-    
-    
-    /**
-     * Returns a new QueryModifier which is a copy of `mod`
-     * with the exception of wildcarded, which is set to `wildcarded`.
-     * @param mod the original QueryModifier to merge
-     * @param wildcarded the new boolean value for `wildcarded` for the new QueryModifier
-     * @return a new QueryModifier which is a merged version of `mod` and `wildcarded`
-     */
-    public static QueryModifier mergeWildcarded(final QueryModifier mod, final boolean wildcarded) {
-        return new QueryModifier(mod.getTermModifier(), mod.isDisjunct(), wildcarded, mod.isSplit());
-    }
-    
-    
-    
-    
-
+	
+	public TermModifier getTermModifier() {
+		return termModifier;
+	}
+	
+	/**
+	 * Returns the QueryModifier for the values of a field.
+	 * @return the QueryModifier for the values of a field
+	 */
+	public QueryModifier getFieldValueModifier() {
+		if (disjunct) {
+			return new QueryModifier(TermModifier.NONE, split, disjunct, wildcarded, fuzzyness);
+		} else {
+			return new QueryModifier(TermModifier.REQUIRED, split, disjunct, wildcarded, fuzzyness);
+		}
+	}
+	
+	public boolean isDisjunct() {
+		return disjunct;
+	}
+	
+	public boolean isSplit() {
+		return split;
+	}
+	
+	public boolean isWildcarded() {
+		return wildcarded;
+	}
+	
+	public boolean isFuzzyEnabled() {
+		return fuzzyness != null;
+	}
+	
+	/**
+	 * Returns the fuzzyness for a fuzzy search.
+	 * Throws an IllegalStateException if fuzzyness is not enabled.
+	 * @return the fuzzyness of the search
+	 * @throws IllegalStateException if fuzzyness is disabled. Check with {@link #isFuzzyEnabled()}
+	 * 
+	 * @see #isFuzzyEnabled()
+	 */
+	public double getFuzzyness() {
+		if (fuzzyness == null) throw new IllegalStateException(ERR_FUZZYNESS_DISABLED);
+		return fuzzyness.doubleValue();
+	}
+	
+	
+	/* 
+	 * Builder Pattern
+	 * The Builder is a static class, and QueryModifier has some helper methods
+	 */
+	
+	public QueryModifier.Builder copy() {
+		return copyOf(this);
+	}
+	
+	public static QueryModifier.Builder copyOf(final QueryModifier mod) {
+		final QueryModifier.Builder builder = new QueryModifier.Builder();
+		builder.setTermModifier(mod.termModifier);
+		builder.setSplit(mod.isSplit());
+		builder.setDisjunct(mod.isDisjunct());
+		builder.setWildcarded(mod.isWildcarded());
+		builder.setFuzzyness(mod.fuzzyness);
+		return builder;
+	}
+	
+	public static QueryModifier.Builder start() {
+		final QueryModifier.Builder builder = new QueryModifier.Builder();
+		builder.setTermModifier(TermModifier.NONE);
+		return builder;
+	}
+	
+	public static class Builder {
+		
+		private TermModifier termModifier;
+		private boolean split;
+		private boolean disjunct;
+		private boolean wildcarded;
+		private Double fuzzyness;
+		
+		
+		public Builder() {
+			this.termModifier = TermModifier.NONE;
+		}
+		
+		
+		public Builder setTermModifier(TermModifier termModifier) {
+			if (termModifier == null) throw new NullPointerException(ERR_TERMMOD_NULL);
+			this.termModifier = termModifier;
+			return this;
+		}
+		
+		public Builder setSplit(boolean split) {
+			this.split = split;
+			return this;
+		}
+		
+		public Builder setDisjunct(boolean disjunct) {
+			this.disjunct = disjunct;
+			return this;
+		}
+		
+		public Builder setWildcarded(boolean wildcarded) {
+			this.wildcarded = wildcarded;
+			return this;
+		}
+		
+		public Builder setFuzzyness(Double fuzzyness) {
+			if (fuzzyness != null) {
+				if (fuzzyness < 0 || fuzzyness >= 1) throw new IllegalArgumentException(ERR_FUZZYNESS_INVALID);
+			}
+			this.fuzzyness = fuzzyness;
+			return this;
+		}
+		
+		
+		public Builder wildcarded() {
+			this.wildcarded = true;
+			return this;
+		}
+		
+		public Builder notWildcarded() {
+			this.wildcarded = false;
+			return this;
+		}
+		
+		public Builder doSplit() {
+			this.split = true;
+			return this;
+		}
+		
+		public Builder dontSplit() {
+			this.split = false;
+			return this;
+		}
+		
+		public Builder disjunct() {
+			this.disjunct = true;
+			return this;
+		}
+		
+		public Builder conjunct() {
+			this.disjunct = false;
+			return this;
+		}
+		
+		public Builder noFuzzyness() {
+			this.fuzzyness = null;
+			return this;
+		}
+		
+		
+		public QueryModifier end() {
+			return new QueryModifier(termModifier, split, disjunct, wildcarded, fuzzyness);
+		}
+	}
+	
 }

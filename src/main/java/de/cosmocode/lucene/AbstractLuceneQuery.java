@@ -36,7 +36,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
      * Initializes this {@link AbstractLuceneQuery} with the QueryModifier {@link QueryModifier#NONE}.
      */
     public AbstractLuceneQuery() {
-        this.defaultModifier = QueryModifier.NONE;
+        this.defaultModifier = QueryModifier.DEFAULT;
     }
     
     /**
@@ -61,8 +61,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     
     @Override
     public void setWildCarded(boolean wildCarded) {
-        this.defaultModifier = new QueryModifier(defaultModifier.getTermModifier(), 
-                defaultModifier.isDisjunct(), wildCarded, defaultModifier.isSplit());
+        this.defaultModifier = defaultModifier.copy().setWildcarded(wildCarded).end();
     }
     
     
@@ -106,7 +105,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     public LuceneQuery addFuzzyArgument(final String value, final boolean mandatory,
             final double fuzzyness) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return this.addFuzzyArgument(value, mod, fuzzyness);
     }
     
@@ -137,7 +136,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addArgument(final String value, final boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return this.addArgument(value, mod);
     }
     
@@ -155,7 +154,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addArgument(final Collection<?> value, final boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return this.addArgument(value, mod);
     }
     
@@ -175,7 +174,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public <K> LuceneQuery addArgument(K[] values, boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addArgument(values, mod);
     }
     
@@ -261,7 +260,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addSubquery(LuceneQuery value, boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addSubquery(value, mod);
     }
     
@@ -285,7 +284,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addField(String key, String value, boolean mandatoryKey) {
         final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addField(key, value, mod);
     }
     
@@ -294,7 +293,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     public LuceneQuery addField(String key, String value,
             boolean mandatoryKey, double boostFactor) {
         final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addField(key, value, mod).addBoost(boostFactor);
     }
     
@@ -318,9 +317,27 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addField(String key, boolean mandatoryKey,
             Collection<?> value, boolean mandatoryValue) {
-        final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = new QueryModifier(tm, !mandatoryValue, 
-                defaultModifier.isWildcarded(), defaultModifier.isSplit());
+        final QueryModifier.Builder builder = defaultModifier.copy();
+        final QueryModifier mod;
+        
+        if (mandatoryKey && mandatoryValue) {
+        	// field is required; all values must occur: conjunction (and)
+        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
+        } else if (mandatoryKey && !mandatoryValue) {
+        	// field is required; no value is mandatory: disjunction (or)
+        	// that means that one of the values must occur
+        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
+        } else if (!mandatoryKey && mandatoryValue) {
+        	// field is not required (but boosted in results);
+        	// all values must occur: conjunction (and)
+        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
+        } else {
+        	// field is not required (but boosted in results);
+        	// no value is mandatory: disjunction (or)
+        	// This means: Each document that has one of the given values for the field is boosted
+        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
+        }
+        
         return addFieldAsCollection(key, value, mod);
     }
     
@@ -328,10 +345,28 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery addField(String key, boolean mandatoryKey,
             Collection<?> value, boolean mandatoryValue, double boostFactor) {
-        final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = new QueryModifier(tm, !mandatoryValue, 
-                defaultModifier.isWildcarded(), defaultModifier.isSplit());
-        return addFieldAsCollection(key, value, mod).addBoost(boostFactor);
+        final QueryModifier.Builder builder = defaultModifier.copy();
+        final QueryModifier mod;
+        
+        if (mandatoryKey && mandatoryValue) {
+        	// field is required; all values must occur: conjunction (and)
+        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
+        } else if (mandatoryKey && !mandatoryValue) {
+        	// field is required; no value is mandatory: disjunction (or)
+        	// that means that one of the values must occur
+        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
+        } else if (!mandatoryKey && mandatoryValue) {
+        	// field is not required (but boosted in results);
+        	// all values must occur: conjunction (and)
+        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
+        } else {
+        	// field is not required (but boosted in results);
+        	// no value is mandatory: disjunction (or)
+        	// This means: Each document that has one of the given values for the field is boosted
+        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
+        }
+        
+        return addFieldAsCollection(key, value, mod, boostFactor);
     }
     
     
@@ -375,7 +410,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     public LuceneQuery addFuzzyField(String key, String value,
             boolean mandatoryKey) {
         final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addFuzzyField(key, value, mod, DEFAULT_FUZZYNESS);
     }
     
@@ -384,7 +419,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     public LuceneQuery addFuzzyField(String key, String value,
             boolean mandatoryKey, double fuzzyness) {
         final TermModifier tm = mandatoryKey ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return addFuzzyField(key, value, mod, fuzzyness);
     }
     
@@ -415,9 +450,11 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     
     
     @Override
-    public final LuceneQuery addFieldAsCollection(String key,
+    public LuceneQuery addFieldAsCollection(String key,
             Collection<?> value, QueryModifier modifier, double boost) {
-        return addFieldAsCollection(key, value, modifier).addBoost(boost);
+        return 
+        addFieldAsCollection(key, value, modifier).
+        addBoost(boost);
     }
     
     
@@ -453,7 +490,7 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     @Override
     public LuceneQuery startField(String fieldName, boolean mandatory) {
         final TermModifier tm = mandatory ? TermModifier.REQUIRED : TermModifier.NONE;
-        final QueryModifier mod = QueryModifier.merge(defaultModifier, tm);
+        final QueryModifier mod = defaultModifier.copy().setTermModifier(tm).end();
         return startField(fieldName, mod);
     }
     

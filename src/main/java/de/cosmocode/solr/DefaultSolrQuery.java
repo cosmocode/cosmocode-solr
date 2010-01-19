@@ -11,6 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 import de.cosmocode.lucene.AbstractLuceneQuery;
 import de.cosmocode.lucene.LuceneHelper;
 import de.cosmocode.lucene.LuceneQuery;
@@ -32,8 +34,7 @@ import de.cosmocode.lucene.QueryModifier;
  * @author olorenz
  *
  */
-// TODO class should be final
-class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
+final class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     private static final Logger log = LoggerFactory.getLogger(DefaultSolrQuery.class);
     
@@ -181,9 +182,9 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     }
     
     
+    @SuppressWarnings("unchecked")
     @Override
     // TODO don't use suppress on the whole method
-    @SuppressWarnings("unchecked")
     public void addFacetField(final String facetFieldName) {
         if (facetFieldName == null) return;
         final Set<String> facetFields;
@@ -207,8 +208,7 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public void addFacetFields(final String... facetFields) {
-        // TODO null should not be omitted, throw NullPointerException
-        if (facetFields == null) return;
+        if (facetFields == null) throw new NullPointerException("facetFields must not be null");
         
         for (final String facetField : facetFields) {
             this.addFacetField(facetField);
@@ -330,24 +330,24 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public <K> DefaultSolrQuery addArgumentAsArray(final K[] values, final QueryModifier modifier) {
-        // TODO quick return if values == null || values.length == 0
-        if (values != null && values.length > 0) {
-            // start
-            queryArguments.append("(");
-            
-            // add items
-            final QueryModifier valueModifier = modifier.getFieldValueModifier();
-            for (K val : values) {
-                addArgument(val, valueModifier);
-            }
-            
-            // end
-            if (queryArguments.charAt(queryArguments.length() - 1) == '(') {
-                // if the just opened bracket is still the last character, then revert it
-                queryArguments.setLength(queryArguments.length() - 1);
-            } else {
-                queryArguments.append(") ");
-            }
+        // quick return
+        if (values == null || values.length == 0) return this;
+        
+        // start
+        queryArguments.append("(");
+        
+        // add items
+        final QueryModifier valueModifier = modifier.getFieldValueModifier();
+        for (K val : values) {
+            addArgument(val, valueModifier);
+        }
+        
+        // end
+        if (queryArguments.charAt(queryArguments.length() - 1) == '(') {
+            // if the just opened bracket is still the last character, then revert it
+            queryArguments.setLength(queryArguments.length() - 1);
+        } else {
+            queryArguments.append(") ");
         }
         
         return this;
@@ -385,10 +385,10 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public DefaultSolrQuery addSubquery(final LuceneQuery value, final boolean mandatory) {
-        if (value != null) {
-            if (mandatory) queryArguments.append("+");
-            queryArguments.append("(").append(value.getQuery()).append(") ");
-        }
+        if (value == null) return this;
+        
+        if (mandatory) queryArguments.append("+");
+        queryArguments.append("(").append(value.getQuery()).append(") ");
         
         return this;
     }
@@ -396,10 +396,10 @@ class DefaultSolrQuery extends AbstractLuceneQuery implements SolrQuery {
     
     @Override
     public DefaultSolrQuery addSubquery(final LuceneQuery value, final QueryModifier modifiers) {
-        if (value != null) {
-            queryArguments.append(modifiers.getTermPrefix());
-            queryArguments.append("(").append(value.getQuery()).append(") ");
-        }
+        if (value == null) return this;
+        
+        queryArguments.append(modifiers.getTermPrefix());
+        queryArguments.append("(").append(value.getQuery()).append(") ");
         
         return this;
     }

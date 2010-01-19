@@ -1,18 +1,40 @@
 package de.cosmocode.solr;
 
-import static org.junit.Assert.*;
+import junit.framework.Assert;
 
 import org.junit.Test;
 
 import de.cosmocode.lucene.TermModifier;
 
+/**
+ * This is a short test for {@link TermModifier}. It tests {@link TermModifier#getModifier()}.
+ *  
+ * @author olorenz
+ */
 public class TermModifierTest {
 
+    /**
+     * Tests {@link TermModifier#getModifier()} on {@link TermModifier#NONE}.
+     */
     @Test
-    public void testGetModifier() {
-        assertEquals("", TermModifier.NONE.getModifier());
-        assertEquals("+", TermModifier.REQUIRED.getModifier());
-        assertEquals("-", TermModifier.PROHIBITED.getModifier());
+    public void testGetModifierNONE() {
+        Assert.assertEquals("", TermModifier.NONE.getModifier());
+    }
+
+    /**
+     * Tests {@link TermModifier#getModifier()} on {@link TermModifier#REQUIRED}.
+     */
+    @Test
+    public void testGetModifierREQUIRED() {
+        Assert.assertEquals("+", TermModifier.REQUIRED.getModifier());
+    }
+
+    /**
+     * Tests {@link TermModifier#getModifier()} on {@link TermModifier#PROHIBITED}.
+     */
+    @Test
+    public void testGetModifierPROHIBITED() {
+        Assert.assertEquals("-", TermModifier.PROHIBITED.getModifier());
     }
 
 }

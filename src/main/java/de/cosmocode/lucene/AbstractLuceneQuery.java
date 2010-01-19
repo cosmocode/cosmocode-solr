@@ -321,21 +321,21 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
         final QueryModifier mod;
         
         if (mandatoryKey && mandatoryValue) {
-        	// field is required; all values must occur: conjunction (and)
-        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
+            // field is required; all values must occur: conjunction (and)
+            mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
         } else if (mandatoryKey && !mandatoryValue) {
-        	// field is required; no value is mandatory: disjunction (or)
-        	// that means that one of the values must occur
-        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
+            // field is required; no value is mandatory: disjunction (or)
+            // that means that one of the values must occur
+            mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
         } else if (!mandatoryKey && mandatoryValue) {
-        	// field is not required (but boosted in results);
-        	// all values must occur: conjunction (and)
-        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
+            // field is not required (but boosted in results);
+            // all values must occur: conjunction (and)
+            mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
         } else {
-        	// field is not required (but boosted in results);
-        	// no value is mandatory: disjunction (or)
-        	// This means: Each document that has one of the given values for the field is boosted
-        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
+            // field is not required (but boosted in results);
+            // no value is mandatory: disjunction (or)
+            // This means: Each document that has one of the given values for the field is boosted
+            mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
         }
         
         return addFieldAsCollection(key, value, mod);
@@ -349,21 +349,21 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
         final QueryModifier mod;
         
         if (mandatoryKey && mandatoryValue) {
-        	// field is required; all values must occur: conjunction (and)
-        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
+            // field is required; all values must occur: conjunction (and)
+            mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(false).end();
         } else if (mandatoryKey && !mandatoryValue) {
-        	// field is required; no value is mandatory: disjunction (or)
-        	// that means that one of the values must occur
-        	mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
+            // field is required; no value is mandatory: disjunction (or)
+            // that means that one of the values must occur
+            mod = builder.setTermModifier(TermModifier.REQUIRED).setDisjunct(true).end();
         } else if (!mandatoryKey && mandatoryValue) {
-        	// field is not required (but boosted in results);
-        	// all values must occur: conjunction (and)
-        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
+            // field is not required (but boosted in results);
+            // all values must occur: conjunction (and)
+            mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(false).end();
         } else {
-        	// field is not required (but boosted in results);
-        	// no value is mandatory: disjunction (or)
-        	// This means: Each document that has one of the given values for the field is boosted
-        	mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
+            // field is not required (but boosted in results);
+            // no value is mandatory: disjunction (or)
+            // This means: Each document that has one of the given values for the field is boosted
+            mod = builder.setTermModifier(TermModifier.NONE).setDisjunct(true).end();
         }
         
         return addFieldAsCollection(key, value, mod, boostFactor);
@@ -453,8 +453,8 @@ public abstract class AbstractLuceneQuery implements LuceneQuery {
     public LuceneQuery addFieldAsCollection(String key,
             Collection<?> value, QueryModifier modifier, double boost) {
         return 
-        addFieldAsCollection(key, value, modifier).
-        addBoost(boost);
+            addFieldAsCollection(key, value, modifier).
+            addBoost(boost);
     }
     
     

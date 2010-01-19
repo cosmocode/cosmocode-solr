@@ -10,12 +10,12 @@ package de.cosmocode.lucene;
 public enum TermModifier {
     
     /**
-     * The affected Term/Field to be added is not affected in a any way.
+     * The affected Term/Field to be added is not affected in any way.
      * This means that all documents that contain the term 
      * come first in the returned result list.
-     * But the returned list is not limited to those documents.
+     * But the returned list is not limited to these documents.
      * If this is the only TermModifier applied to the SolrQuery,
-     * then all documents stored in the lucene/solr index 
+     * then all documents stored in the lucene/solr index are found by solr.
      * <br> <br>
      * The implementation should prepend nothing to the Term/Field,
      * or use {@link TermModifier#getModifier()}.

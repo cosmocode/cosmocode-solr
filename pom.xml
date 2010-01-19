@@ -33,5 +33,9 @@
     	<groupId>de.cosmocode</groupId>
     	<artifactId>cosmocode-patterns</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.google.collections</groupId>
+    	<artifactId>google-collections</artifactId>
+    </dependency>
   </dependencies>
 </project>

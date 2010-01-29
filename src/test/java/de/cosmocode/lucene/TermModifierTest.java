@@ -1,10 +1,8 @@
-package de.cosmocode.solr;
+package de.cosmocode.lucene;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-
-import de.cosmocode.lucene.TermModifier;
 
 /**
  * This is a short test for {@link TermModifier}. It tests {@link TermModifier#getModifier()}.

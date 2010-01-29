@@ -23,7 +23,7 @@ import java.util.Collection;
  * 
  * @see LuceneQuery
  * 
- * @author olorenz
+ * @author Oliver Lorenz
  *
  */
 public abstract class AbstractLuceneQuery implements LuceneQuery {

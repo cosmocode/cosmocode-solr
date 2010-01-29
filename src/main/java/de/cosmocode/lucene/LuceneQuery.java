@@ -13,7 +13,7 @@ import java.util.Collection;
  * 
  * @see AbstractLuceneQuery
  * 
- * @author olorenz
+ * @author Oliver Lorenz
  *
  */
 public interface LuceneQuery {

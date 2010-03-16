@@ -4,17 +4,33 @@
   <artifactId>cosmocode-solr</artifactId>
   <packaging>jar</packaging>
   <version>1.2-SNAPSHOT</version>
-  <name>CosmoCode SOLR</name>
-  <url>http://maven.apache.org</url>
+  <name>CosmoCode Solr</name>
   <parent>
-  	<artifactId>cosmocode-parent</artifactId>
-  	<groupId>de.cosmocode</groupId>
-  	<version>1.5.2</version>
+    <artifactId>cosmocode-parent</artifactId>
+    <groupId>de.cosmocode</groupId>
+    <version>1.5.4</version>
   </parent>
   <scm>
-  	<developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/trunk</developerConnection>
+    <developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/trunk</developerConnection>
   </scm>
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.cosmocode</groupId>
+      <artifactId>cosmocode-patterns</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.collections</groupId>
+      <artifactId>google-collections</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -25,19 +41,6 @@
       <artifactId>log4j-config</artifactId>
       <version>1.0.2</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>commons-lang</groupId>
-    	<artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>de.cosmocode</groupId>
-    	<artifactId>cosmocode-patterns</artifactId>
-	<version>1.4.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.google.collections</groupId>
-    	<artifactId>google-collections</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -8,7 +8,7 @@
   <parent>
     <artifactId>cosmocode-parent</artifactId>
     <groupId>de.cosmocode</groupId>
-    <version>1.5.4</version>
+    <version>2.0.1</version>
   </parent>
   <scm>
     <developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/trunk</developerConnection>
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>de.cosmocode</groupId>
       <artifactId>cosmocode-patterns</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
       <groupId>com.google.collections</groupId>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>de.cosmocode</groupId>
       <artifactId>log4j-config</artifactId>
-      <version>1.0.2</version>
+      <version>1.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

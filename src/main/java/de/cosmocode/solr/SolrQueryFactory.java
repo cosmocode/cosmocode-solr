@@ -16,6 +16,10 @@
 
 package de.cosmocode.solr;
 
+import de.cosmocode.lucene.LuceneHelper;
+import de.cosmocode.lucene.LuceneQuery;
+import de.cosmocode.lucene.LuceneQueryBuilder;
+
 /**
  * This Factory creates {@link SolrQuery}s.
  * 
@@ -36,21 +40,77 @@ public final class SolrQueryFactory {
      * @return a SolrQuery which is not thread-safe
      */
     public static SolrQuery createSolrQuery() {
-        return new DefaultSolrQuery(0, SolrQuery.MAX, true);
+        return new DefaultSolrQuery(0, SolrQuery.MAX, LuceneHelper.newQuery());
     }
     
     
     /**
-     * Returns a new SolrQuery that is not thread-safe and is initialized with the query: "+dtype_s:"+dtype.<br>
-     * It sets start to 0, max to {@link SolrQuery#MAX} and wildcarded to true.
-     * 
-     * @param dtype the "dtype_s" field is automatically initialized with this value
-     * @return a new SolrQuery which is not thread-safe
+     * <p> Returns an implementation of SolrQuery that is backed by the
+     * org.apache.solr.client.solrj.SolrQuery
+     * implementation. This can be used to search with SolrJ
+     * while providing the methods of the SolrQuery interface.
+     * </p>
+     * @return a new SolrJQuery
      */
-    public static SolrQuery createSolrQuery(final String dtype) {
-        return new DefaultSolrQuery(dtype, 0, SolrQuery.MAX, true);
+    public static SolrJQuery createSolrJQuery() {
+        return new SolrJQuery(0, SolrQuery.MAX, LuceneHelper.newQuery());
     }
-            
     
+    
+    /**
+     * <p> Returns a default implementation of SolrQuery that is not thread-safe.<br>
+     * It sets start to 0, max to {@link SolrQuery#MAX} and wildcarded to true.
+     * It also appends a field named "dtype_s" with the specified parameter as value.
+     * </p>
+     * <p> This method is deprecated, because it does nothing more than calling <br />
+     * <code>query.addField("dtype_s", dtype, LuceneHelper.MOD_ID);</code>. <br />
+     * If you need some generic builder method that always returns the same query try the following:
+     * </p>
+     * <pre>
+
+import de.cosmocode.lucene.LuceneHelper;
+import de.cosmocode.lucene.LuceneQueryBuilder;
+
+...
+    
+    private static final LuceneQueryBuilder BUILDER;
+    
+    static {
+        BUILDER = new LuceneQueryBuilder();
+        BUILDER.addField("dtype_s", "shop", LuceneHelper.MOD_ID);
+        BUILDER.lock();
+    }
+    
+    public SolrQuery create() {
+        return SolrQueryFactory.createSolrQuery(BUILDER.build());
+    }
+     * </pre>
+     * 
+     * @deprecated use a {@link LuceneQueryBuilder} with {@link #createSolrQuery(LuceneQuery)} instead
+     * @param dtype the dtype_s
+     * @return a SolrQuery which is not thread-safe
+     */
+    @Deprecated
+    public static SolrQuery createSolrQuery(final String dtype) {
+        final SolrQuery query = createSolrQuery();
+        query.addField("dtype_s", dtype, LuceneHelper.MOD_ID);
+        return query;
+    }
+    
+    
+    /**
+     * <p> Returns a default implementation of SolrQuery.
+     * It delegates every method that belongs to LuceneQuery
+     * to the given implementation.
+     * </p>
+     * <p> start is set to 0, max is set to {@link SolrQuery#MAX}.
+     * </p>
+     * 
+     * @param luceneQuery the delegate for all LuceneQuery related methods
+     * @return a SolrQuery that delegates its methods to the given LuceneQuery
+     */
+    public static SolrQuery createSolrQuery(final LuceneQuery luceneQuery) {
+        return new DefaultSolrQuery(0, SolrQuery.MAX, luceneQuery);
+    }
 
 }

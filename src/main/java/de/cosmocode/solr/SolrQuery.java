@@ -42,7 +42,6 @@ public interface SolrQuery extends LuceneQuery {
      */
     int MAX = 10000000;
     
-    
     /**
      * Returns the selected fields for the query - cannot be null, but "*" indicates that all are selected.
      * @return the selected fields for the query - cannot be null, but "*" indicates that all are selected
@@ -104,8 +103,6 @@ public interface SolrQuery extends LuceneQuery {
      * Sets the maximum number of results/documents that this query will return.
      * <br>The maximum value is {@link #MAX}
      * @param rows the maximum number of results/documents that this query will return.
-     * 
-     * @see #setMax(int)
      */
     void setRows(final int rows);
     

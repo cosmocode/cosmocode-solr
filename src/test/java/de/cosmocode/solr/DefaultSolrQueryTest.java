@@ -22,9 +22,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.cosmocode.junit.UnitProvider;
-import de.cosmocode.lucene.LuceneQueryTest;
 import de.cosmocode.lucene.LuceneHelper;
-import de.cosmocode.lucene.LuceneQuery;
+import de.cosmocode.lucene.LuceneQueryTest;
 
 /**
  * Tests {@link DefaultSolrQuery}.
@@ -33,10 +32,10 @@ import de.cosmocode.lucene.LuceneQuery;
  */
 @RunWith(Suite.class)
 @SuiteClasses(LuceneQueryTest.class)
-public final class DefaultSolrQueryTest implements UnitProvider<LuceneQuery> {
+public final class DefaultSolrQueryTest implements UnitProvider<DefaultSolrQuery> {
     
     @Override
-    public SolrQuery unit() {
+    public DefaultSolrQuery unit() {
         return new DefaultSolrQuery(0, SolrQuery.MAX, LuceneHelper.newQuery());
     }
     

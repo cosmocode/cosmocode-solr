@@ -3,7 +3,7 @@
 	<groupId>de.cosmocode</groupId>
 	<artifactId>cosmocode-solr</artifactId>
 	<packaging>jar</packaging>
-	<version>1.3-SNAPSHOT</version>
+	<version>1.2.1</version>
 	<name>CosmoCode Solr</name>
 	<parent>
 		<artifactId>cosmocode-parent</artifactId>
@@ -11,7 +11,7 @@
 		<version>2.4.0</version>
 	</parent>
 	<scm>
-		<developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/trunk</developerConnection>
+		<developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/tags/1.2.1</developerConnection>
 	</scm>
 	<repositories>
 		<repository>

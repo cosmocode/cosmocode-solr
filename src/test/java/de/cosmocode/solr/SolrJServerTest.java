@@ -123,7 +123,24 @@ public class SolrJServerTest {
         LOG.debug("Sent query {} with maximum {}", query.getQuery(), query.getMax());
         final QueryResponse response = server.query(query.getSolrJ());
         LOG.debug("SolrServer running, got {} results", response.getResults().size());
-        Assert.assertTrue(response.getResults().size() > 0);
+        Assert.assertEquals(1012, response.getResults().size());
+    }
+    
+    /**
+     * Tests the integration of the SolrJQuery into the EmbeddedSolrServer.
+     * Tests SolrJQuery with start set to MAX.
+     * @throws SolrServerException if some exception occurred in the solr server
+     */
+    @Test
+    public void queryWithStart() throws SolrServerException {
+        final SolrJQuery query = SolrQueryFactory.createSolrJQuery();
+        query.setStart(SolrQuery.MAX);
+        query.addField("dtype_s", "city", SolrQuery.MOD_ID);
+        LOG.debug("Sent query {} with start: {} and max: {}", 
+            new Object[] {query.getQuery(), query.getStart(), query.getMax()});
+        final QueryResponse response = server.query(query.getSolrJ());
+        LOG.debug("SolrServer running, got {} results", response.getResults().size());
+        Assert.assertEquals(0, response.getResults().size());
     }
     
     /**

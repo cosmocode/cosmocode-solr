@@ -16,11 +16,10 @@
 
 package de.cosmocode.solr;
 
+import de.cosmocode.lucene.LuceneQuery;
+import de.cosmocode.lucene.LuceneQueryBuilder;
 import org.junit.Assert;
 import org.junit.Test;
-
-import de.cosmocode.lucene.LuceneHelper;
-import de.cosmocode.lucene.LuceneQueryBuilder;
 
 /**
  * Small test for {@link SolrQueryFactory} and {@link SolrQuery}.
@@ -33,7 +32,7 @@ public class SolrQueryFactoryTest {
     
     static {
         BUILDER = new LuceneQueryBuilder();
-        BUILDER.addField("dtype_s", "shop", LuceneHelper.MOD_ID);
+        BUILDER.addField("dtype_s", "shop", LuceneQuery.MOD_ID);
         BUILDER.lock();
     }
     
@@ -57,6 +56,7 @@ public class SolrQueryFactoryTest {
     /**
      * Tests {@link SolrQueryFactory#createSolrQuery(String)}.
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void testCreateSolrQueryDtype() {
         final SolrQuery query = SolrQueryFactory.createSolrQuery("shop");

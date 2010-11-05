@@ -23,52 +23,211 @@ import org.apache.solr.update.DocumentBuilder;
 
 import com.google.common.base.Function;
 
+/**
+ * <p> This is an abstract definition of {@link DocumentBuilder} that also adds some utility methods.
+ * </p>
+ *
+ * @author Oliver Lorenz
+ */
 public interface SolrDocumentBuilder {
 
+    /**
+     * Returns the int suffix, as used by {@link #addDynamicField(String, Integer)}
+     * and {@link #addDynamicField(String, int)}.
+     * Default is "_i".
+     * @return the int suffix, default "_i"
+     */
     String getIntSuffix();
 
+    /**
+     * Sets the int suffix, as used by {@link #addDynamicField(String, Integer)}
+     * and {@link #addDynamicField(String, int)}.
+     * Default is "_i".
+     * @param intSuffix the new int suffix
+     */
     void setIntSuffix(String intSuffix);
 
+    /**
+     * Returns the long suffix, as used by {@link #addDynamicField(String, Long)}
+     * and {@link #addDynamicField(String, long)}.
+     * Default is "_l".
+     * @return the long suffix, default "_l"
+     */
     String getLongSuffix();
 
+    /**
+     * Sets the long suffix, as used by {@link #addDynamicField(String, Long)}
+     * and {@link #addDynamicField(String, long)}.
+     * Default is "_l".
+     * @param longSuffix the new long suffix
+     */
     void setLongSuffix(String longSuffix);
 
+    /**
+     * Returns the boolean suffix, as used by {@link #addDynamicField(String, Boolean)}
+     * and {@link #addDynamicField(String, boolean)}.
+     * Default is "_b".
+     * @return the boolean suffix, default "_b"
+     */
     String getBoolSuffix();
 
+    /**
+     * Sets the boolean suffix, as used by {@link #addDynamicField(String, Boolean)}
+     * and {@link #addDynamicField(String, boolean)}.
+     * Default is "_b".
+     * @param boolSuffix the new boolean suffix
+     */
     void setBoolSuffix(String boolSuffix);
 
+    /**
+     * Returns the double suffix, as used by {@link #addDynamicField(String, Double)}
+     * and {@link #addDynamicField(String, double)}.
+     * Default is "_d".
+     * @return the double suffix, default "_d"
+     */
     String getDoubleSuffix();
 
+    /**
+     * Sets the double suffix, as used by {@link #addDynamicField(String, Double)}
+     * and {@link #addDynamicField(String, double)}.
+     * Default is "_d".
+     * @param doubleSuffix the new double suffix
+     */
     void setDoubleSuffix(String doubleSuffix);
 
+    /**
+     * Returns the float suffix, as used by {@link #addDynamicField(String, Float)}
+     * and {@link #addDynamicField(String, float)}.
+     * Default is "_f".
+     * @return the float suffix, default "_f"
+     */
     String getFloatSuffix();
 
+    /**
+     * Sets the float suffix, as used by {@link #addDynamicField(String, Float)}
+     * and {@link #addDynamicField(String, float)}.
+     * Default is "_f".
+     * @param floatSuffix the new float suffix
+     */
     void setFloatSuffix(String floatSuffix);
 
+    /**
+     * Returns the date suffix, as used by {@link #addDynamicField(String, Date)}.
+     * Default is "_dt".
+     * @return the date suffix, default "_dt"
+     */
     String getDateSuffix();
 
+    /**
+     * Sets the date suffix, as used by {@link #addDynamicField(String, Date)}.
+     * Default is "_dt".
+     * @param dateSuffix the new date suffix
+     */
     void setDateSuffix(String dateSuffix);
 
+    /**
+     * Returns the collection suffix, as used by {@link #addDynamicField(String, Collection)}
+     * {@link #addDynamicField(String, Collection, Function)} and
+     * by {@link #addDynamicField(String, String, StringMode)} with {@value StringMode#SPLIT}.
+     * Default is "_tw".
+     * @return the collection suffix, default "_tw"
+     */
     String getCollectionSuffix();
 
+    /**
+     * Sets the collection suffix, as used by {@link #addDynamicField(String, Collection)}
+     * {@link #addDynamicField(String, Collection, Function)} and
+     * by {@link #addDynamicField(String, String, StringMode)} with {@value StringMode#SPLIT}.
+     * Default is "_tw".
+     * @param collectionSuffix the new collection suffix
+     */
     void setCollectionSuffix(String collectionSuffix);
 
+    /**
+     * Returns the String suffix, as used by {@link #addDynamicField(String, String)}
+     * and {@link #addDynamicField(String, String, StringMode)} with {@value StringMode#STRING}.
+     * Default is "_s".
+     * @return the string suffix, default "_s"
+     */
     String getStringSuffix();
 
+    /**
+     * Sets the String suffix, as used by {@link #addDynamicField(String, String)}
+     * and {@link #addDynamicField(String, String, StringMode)} with {@value StringMode#STRING}.
+     * Default is "_s".
+     * @param stringSuffix the new string suffix
+     */
     void setStringSuffix(String stringSuffix);
 
+    /**
+     * Returns the text suffix, as used by {@link #addDynamicField(String, String, StringMode)}
+     * with {@value StringMode#TEXT}.
+     * Default is "_t".
+     * @return the text suffix, default "_t"
+     */
     String getTextSuffix();
 
+    /**
+     * Sets the text suffix. This is used in {@link #addDynamicField(String, String, StringMode)}
+     * with {@value StringMode#TEXT}.
+     * The default text suffix is "_t".
+     * @param textSuffix sets the new text suffix.
+     */
     void setTextSuffix(String textSuffix);
 
+    /**
+     * <p>
+     * Adds a field with the given name and the given boolean value to this builder.
+     * </p>
+     * <p>
+     * This is the same as calling <code>builder.addField(name, Boolean.toString(b))</code>
+     * </p>
+     * @param name the name of the field
+     * @param b the boolean value to add
+     */
     void addBooleanField(final String name, final boolean b);
 
+    /**
+     * <p>
+     * Adds a field with the given name and the given Boolean value to this builder.
+     * </p>
+     * <p>
+     * If the given Boolean is null, then Boolean.FALSE.toString() is added.
+     * Otherwise it behaves like <code>builder.addField(name, Boolean.toString(b))</code>
+     * </p>
+     * @param name the name of the field
+     * @param b the Boolean value to add
+     */
     void addBooleanField(final String name, final Boolean b);
 
+    /**
+     * <p>
+     * Adds a field with the given name and the given int value to this builder.
+     * This is the same as calling <code>builder.addField(name, Integer.toString(i));</code>
+     * </p>
+     * @param name the name of the field
+     * @param i the int value to add
+     */
     void addNumericField(final String name, final int i);
 
+    /**
+     * <p>
+     * Adds a field with the given name and the given long value to this builder.
+     * This is the same as calling <code>builder.addField(name, Long.toString(l));</code>
+     * </p>
+     * @param name the name of the field
+     * @param l the long value to add
+     */
     void addNumericField(final String name, final long l);
 
+    /**
+     * <p>
+     * Adds a field with the given name and the given double value to this builder.
+     * This is the same as calling <code>builder.addField(name, Double.toString(d));</code>
+     * </p>
+     * @param name the name of the field
+     * @param d the double value to add
+     */
     void addNumericField(final String name, final double d);
     
     /**

@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -47,8 +45,6 @@ import de.cosmocode.lucene.LuceneQuery;
  *
  */
 final class DefaultSolrQuery extends ForwardingLuceneQuery implements SolrQuery {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSolrQuery.class);
     
     private static final String ERR_START_INVALID = 
         "start must be a non-negative integer (i.e. start >= 0)";
@@ -174,16 +170,13 @@ final class DefaultSolrQuery extends ForwardingLuceneQuery implements SolrQuery 
         if (facetFieldName == null) return;
         final Set<String> facetFields;
         if (requestArguments.containsKey("facet.field")) {
-            try {
-                @SuppressWarnings("unchecked")
-                final Set<String> tmpFields = (Set<String>) requestArguments.get("facet.field");
-                facetFields = tmpFields;
-            } catch (ClassCastException e) {
-                LOG.warn("Cannot get facet.field", e);
-                // TODO instanceof check would save us an exception 
-                // TODO fail here ?!
-                return;
-            }
+            final Object obj = requestArguments.get("facet.field");
+            Preconditions.checkNotNull(obj, "value of 'facet.field'");
+            Preconditions.checkState(obj instanceof Set<?>, 
+                "Expected facet.field to be a Set<String>, but was %s", obj.getClass());
+            @SuppressWarnings("unchecked")
+            final Set<String> tmpFields = (Set<String>) requestArguments.get("facet.field");
+            facetFields = tmpFields;
         } else {
             facetFields = new HashSet<String>();
             requestArguments.put("facet.field", facetFields);
@@ -216,18 +209,25 @@ final class DefaultSolrQuery extends ForwardingLuceneQuery implements SolrQuery 
     public Set<Map.Entry<String, Object>> getRequestArgumentSet() {
         return getRequestArguments().entrySet();
     }
-    
+
+    @Override
+    public org.apache.solr.client.solrj.SolrQuery toApacheSolrQuery() {
+        // start and rows is set in constructor. query is copied from delegate.
+        final SolrJQuery solrJQuery = new SolrJQuery(getStart(), getRows(), delegate());
+        for (final Map.Entry<String, Object> requestEntry : this.requestArguments.entrySet()) {
+            solrJQuery.setRequestArgument(requestEntry.getKey(), requestEntry.getValue().toString());
+        }
+        return solrJQuery.getSolrJ();
+    }
     
     @Override
     protected LuceneQuery delegate() {
         return forwarded;
     }
     
-    
     @Override
     public String toString() {
         return getRequestArguments().toString();
     }
-    
 
 }

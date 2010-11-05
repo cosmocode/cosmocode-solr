@@ -159,4 +159,9 @@ public final class SolrJQuery extends ForwardingLuceneQuery implements SolrQuery
         }
     }
 
+    @Override
+    public org.apache.solr.client.solrj.SolrQuery toApacheSolrQuery() {
+        return getSolrJ();
+    }
+
 }

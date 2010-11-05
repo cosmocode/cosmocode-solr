@@ -35,12 +35,12 @@ import de.cosmocode.lucene.LuceneQuery;
  */
 public interface SolrQuery extends LuceneQuery {
     
-    // TODO: find out real max value
-    
     /**
      * This is the maximum value for "max" that solr can handle, which is {@value}.
+     * It is deliberately chosen lower than Integer.MAX_VALUE,
+     * because otherwise together with a start value there would be an integer overflow in the solr server.
      */
-    int MAX = 10000000;
+    int MAX = Integer.MAX_VALUE / 4;
     
     /**
      * Returns the selected fields for the query - cannot be null, but "*" indicates that all are selected.
@@ -171,5 +171,16 @@ public interface SolrQuery extends LuceneQuery {
      */
     Map<String, Object> getRequestArguments();
     
+    /**
+     * <p>
+     * Returns an {@link org.apache.solr.client.solrj.SolrQuery} that has the same settings
+     * as this SolrQuery instance.
+     * </p>
+     * <p>
+     * Implementations are free to return a new instance or a cached instance every time this method is called.
+     * </p>
+     * @return an {@link org.apache.solr.client.solrj.SolrQuery}, with copied settings from this SolrQuery
+     */
+    org.apache.solr.client.solrj.SolrQuery toApacheSolrQuery();
 
 }

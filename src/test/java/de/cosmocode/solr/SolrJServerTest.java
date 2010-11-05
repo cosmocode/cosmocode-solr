@@ -39,8 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import de.cosmocode.lucene.LuceneHelper;
-
 /**
  * Tests the {@link SolrJQuery} on an embedded solr server.
  *
@@ -69,7 +67,7 @@ public class SolrJServerTest {
      * @throws ParserConfigurationException if an error occurs
      */
     @BeforeClass
-    public static void beforeClass() throws ParserConfigurationException, IOException, SAXException {
+    public static void startServer() throws ParserConfigurationException, IOException, SAXException {
         LOG.debug("Starting Solr Server...");
         
         final File solrDirectory = new File("src/test/resources/solr");
@@ -95,7 +93,7 @@ public class SolrJServerTest {
      * Stops the Solr server after all tests are run.
      */
     @AfterClass
-    public static void afterClass() {
+    public static void stopServer() {
         LOG.debug("Stopping Solr Server...");
         core.close();
         LOG.debug("Stopped Solr Server");
@@ -121,9 +119,11 @@ public class SolrJServerTest {
     @Test
     public void query() throws SolrServerException {
         final SolrJQuery query = SolrQueryFactory.createSolrJQuery();
-        query.addField("dtype_s", "city", LuceneHelper.MOD_ID);
+        query.addField("dtype_s", "city", SolrQuery.MOD_ID);
+        LOG.debug("Sent query {} with maximum {}", query.getQuery(), query.getMax());
         final QueryResponse response = server.query(query.getSolrJ());
         LOG.debug("SolrServer running, got {} results", response.getResults().size());
+        Assert.assertTrue(response.getResults().size() > 0);
     }
     
     /**
@@ -151,8 +151,8 @@ public class SolrJServerTest {
             
             // read document
             final SolrJQuery query = SolrQueryFactory.createSolrJQuery();
-            query.addField("dynamic_t", "here}", LuceneHelper.MOD_TEXT);
-            query.addField("other_id_s", "12345", LuceneHelper.MOD_ID);
+            query.addField("dynamic_t", "here}", SolrQuery.MOD_TEXT);
+            query.addField("other_id_s", "12345", SolrQuery.MOD_ID);
             final QueryResponse response = server.query(query.getSolrJ());
             Assert.assertEquals("false id", newId, response.getResults().get(0).get("id"));
             Assert.assertEquals("Too many documents", 1, response.getResults().size());

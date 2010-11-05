@@ -215,7 +215,13 @@ final class DefaultSolrQuery extends ForwardingLuceneQuery implements SolrQuery 
         // start and rows is set in constructor. query is copied from delegate.
         final SolrJQuery solrJQuery = new SolrJQuery(getStart(), getRows(), delegate());
         for (final Map.Entry<String, Object> requestEntry : this.requestArguments.entrySet()) {
-            solrJQuery.setRequestArgument(requestEntry.getKey(), requestEntry.getValue().toString());
+            if (requestEntry.getValue() instanceof String) {
+                solrJQuery.setRequestArgument(requestEntry.getKey(), requestEntry.getValue().toString());
+            } else if (requestEntry.getValue() instanceof Iterable<?>) {
+                for (final Object obj : Iterable.class.cast(requestEntry.getValue())) {
+                    solrJQuery.getSolrJ().add(requestEntry.getKey(), obj.toString());
+                }
+            }
         }
         return solrJQuery.getSolrJ();
     }

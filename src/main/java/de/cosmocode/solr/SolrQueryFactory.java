@@ -103,6 +103,25 @@ import de.cosmocode.lucene.LuceneQueryBuilder;
     
     
     /**
+     * <p> Returns a default implementation of SolrQuery.
+     * start is set to 0, max is set to {@link SolrQuery#MAX}.
+     * </p>
+     * <p> The query is initialized with the given QueryModifier.
+     * This has the same effect as calling {@link SolrQuery#setModifier(QueryModifier)}
+     * on {@link #createSolrJQuery()}.
+     * </p>
+     * 
+     * @param mod the default modifier for the SolrQuery
+     * @return a SolrQuery that delegates its methods to the given LuceneQuery
+     */
+    public static SolrQuery createSolrQuery(final QueryModifier mod) {
+        final SolrQuery query = createSolrQuery();
+        query.setModifier(mod);
+        return query;
+    }
+    
+    
+    /**
      * <p> Returns an implementation of SolrQuery that is backed by the
      * org.apache.solr.client.solrj.SolrQuery
      * implementation. This can be used to search with SolrJ

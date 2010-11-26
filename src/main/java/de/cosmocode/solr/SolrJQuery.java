@@ -18,8 +18,8 @@ package de.cosmocode.solr;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.common.params.CommonParams;

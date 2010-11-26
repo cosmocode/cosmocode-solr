@@ -16,10 +16,11 @@
 
 package de.cosmocode.solr;
 
-import de.cosmocode.lucene.LuceneQuery;
-import de.cosmocode.lucene.LuceneQueryBuilder;
 import org.junit.Assert;
 import org.junit.Test;
+
+import de.cosmocode.lucene.LuceneQuery;
+import de.cosmocode.lucene.LuceneQueryBuilder;
 
 /**
  * Small test for {@link SolrQueryFactory} and {@link SolrQuery}.

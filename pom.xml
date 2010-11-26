@@ -11,7 +11,7 @@
 		<version>2.6.0</version>
 	</parent>
 	<scm>
-		<developerConnection>scm:svn:https://commons.svn.cosmocode.de/cosmocode-solr/trunk</developerConnection>
+		<developerConnection>scm:git:git@github.com:cosmocode/${project.artifactId}.git</developerConnection>
 	</scm>
 	<repositories>
 		<repository>

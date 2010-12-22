@@ -57,11 +57,9 @@ public final class UtilityDocumentBuilder extends DocumentBuilder implements Sol
     private String stringSuffix = "_s";
     private String textSuffix = "_t";
     
-    
     public UtilityDocumentBuilder(final IndexSchema schema) {
         super(schema);
     }
-    
 
     @Override
     public String getIntSuffix() {
@@ -152,7 +150,6 @@ public final class UtilityDocumentBuilder extends DocumentBuilder implements Sol
     public void setTextSuffix(String textSuffix) {
         this.textSuffix = textSuffix;
     }
-
 
     @Override
     public void addBooleanField(final String name, final boolean b) {
